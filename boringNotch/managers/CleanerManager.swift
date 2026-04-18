@@ -13,6 +13,7 @@ import Security
 
 // MARK: - Admin Authorization
 
+@MainActor
 final class AdminAuthorization: ObservableObject {
     static let shared = AdminAuthorization()
 
@@ -26,15 +27,15 @@ final class AdminAuthorization: ObservableObject {
         var authRights = AuthorizationRights(count: 1, items: &authItem)
         let authFlags: AuthorizationFlags = [.interactionAllowed, .preAuthorize, .extendRights]
 
-        var status = AuthorizationCreate(nil, nil, [], &authRef)
+        var tempAuthRef: AuthorizationRef?
+        var status = AuthorizationCreate(nil, nil, [], &tempAuthRef)
 
-        if status == errAuthorizationSuccess {
-            status = AuthorizationCopyRights(authRef, &authRights, nil, authFlags, nil)
+        if status == errAuthorizationSuccess, let ref = tempAuthRef {
+            status = AuthorizationCopyRights(ref, &authRights, nil, authFlags, nil)
+            authRef = ref
         }
 
-        await MainActor.run {
-            self.isAuthorized = (status == errAuthorizationSuccess)
-        }
+        isAuthorized = (status == errAuthorizationSuccess)
 
         if status == errAuthorizationSuccess {
             return true
@@ -56,9 +57,7 @@ final class AdminAuthorization: ObservableObject {
         if let appleScript = NSAppleScript(source: script) {
             appleScript.executeAndReturnError(&error)
             let success = error == nil
-            await MainActor.run {
-                self.isAuthorized = success
-            }
+            isAuthorized = success
             return success
         }
         return false
@@ -93,6 +92,7 @@ final class AdminAuthorization: ObservableObject {
 
 // MARK: - CleanerManager
 
+@MainActor
 final class CleanerManager: ObservableObject {
     static let shared = CleanerManager()
 

@@ -294,7 +294,9 @@ struct ClipboardCard: View {
     @ViewBuilder
     private var filePreview: some View {
         HStack(spacing: 4) {
-            fileIcon
+            Image(nsImage: fileIcon)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
                 .frame(width: 20, height: 20)
 
             VStack(alignment: .leading, spacing: 1) {
