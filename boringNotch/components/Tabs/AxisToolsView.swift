@@ -11,17 +11,28 @@ import Defaults
 struct AxisToolsView: View {
     @EnvironmentObject var vm: BoringViewModel
 
+    @Default(.showCalculator) private var showCalculator
+    @Default(.showSystemInfo) private var showSystemInfo
+    @Default(.showWeather) private var showWeather
+    @Default(.showScreenshot) private var showScreenshot
+    @Default(.showWorldClock) private var showWorldClock
+    @Default(.showUSBDevices) private var showUSBDevices
+    @Default(.showNotchControl) private var showNotchControl
+    @Default(.showStorageInfo) private var showStorageInfo
+    @Default(.showAppLauncher) private var showAppLauncher
+
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
-                CalculatorCard()
-                SystemInfoCard()
-                WeatherCard()
-                ScreenshotCard()
-                WorldClockCard()
-                USBDevicesCard()
-                NotchControlCard(onHide: { vm.close() }, onShow: { vm.open() })
-                StorageCard()
+                if showCalculator { CalculatorCard() }
+                if showSystemInfo { SystemInfoCard() }
+                if showWeather { WeatherCard() }
+                if showScreenshot { ScreenshotCard() }
+                if showWorldClock { WorldClockCard() }
+                if showUSBDevices { USBDevicesCard() }
+                if showNotchControl { NotchControlCard(onHide: { vm.close() }, onShow: { vm.open() }) }
+                if showStorageInfo { StorageCard() }
+                if showAppLauncher { AppLauncherCard() }
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)

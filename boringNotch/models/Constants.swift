@@ -203,4 +203,28 @@ extension Defaults.Keys {
     // MARK: AI Parser
     static let cloudAPIEndpoint = Key<String>("cloudAPIEndpoint", default: "")
     static let cloudAPIKey = Key<String>("cloudAPIKey", default: "")
+
+    // MARK: Tasks Tab
+    static let showVoiceInput = Key<Bool>("showVoiceInput", default: true)
+    static let showPomodoro = Key<Bool>("showPomodoro", default: true)
+    static let showStopwatch = Key<Bool>("showStopwatch", default: true)
+    static let showQuickNote = Key<Bool>("showQuickNote", default: true)
+    static let showClipboardHistory = Key<Bool>("showClipboardHistory", default: true)
+    static let showTasksTab = Key<Bool>("showTasksTab", default: true)
+
+    // MARK: Tools Tab
+    static let showCalculator = Key<Bool>("showCalculator", default: true)
+    static let showSystemInfo = Key<Bool>("showSystemInfo", default: true)
+    static let showWeather = Key<Bool>("showWeather", default: true)
+    static let showScreenshot = Key<Bool>("showScreenshot", default: true)
+    static let showWorldClock = Key<Bool>("showWorldClock", default: true)
+    static let showUSBDevices = Key<Bool>("showUSBDevices", default: false)
+    static let showNotchControl = Key<Bool>("showNotchControl", default: true)
+    static let showStorageInfo = Key<Bool>("showStorageInfo", default: false)
+    static let showAppLauncher = Key<Bool>("showAppLauncher", default: true)
+    static let showWaterTracker = Key<Bool>("showWaterTracker", default: true)
+    static let showToolsTab = Key<Bool>("showToolsTab", default: true)
+
+    // MARK: AI Provider
+    static let aiProvider = Key<String>("aiProvider", default: "appleIntelligence")
 }

@@ -17,6 +17,8 @@ struct ShelfView: View {
     @ObservedObject private var clipboardManager = ClipboardManager.shared
     @State private var searchQuery: String = ""
 
+    @Default(.showClipboardHistory) private var showClipboardHistory
+
     private let spacing: CGFloat = 8
 
     var body: some View {
@@ -33,48 +35,48 @@ struct ShelfView: View {
                     }
             }
 
-            Divider()
-                .background(Color.white.opacity(0.1))
+            if showClipboardHistory {
+                Divider()
+                    .background(Color.white.opacity(0.1))
 
-            // Clipboard section
-            HStack(spacing: 6) {
-                Image(systemName: "clipboard")
-                    .font(.system(size: 10))
-                    .foregroundColor(.gray)
+                // Clipboard section
+                HStack(spacing: 6) {
+                    Image(systemName: "clipboard")
+                        .font(.system(size: 10))
+                        .foregroundColor(.gray)
 
-                Text("Clipboard")
-                    .font(.system(size: 10, weight: .semibold))
-                    .foregroundColor(.gray)
+                    Text("Clipboard")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundColor(.gray)
 
-                Spacer()
+                    Spacer()
 
-                // Search
-                Image(systemName: "magnifyingglass")
-                    .font(.system(size: 9))
-                    .foregroundColor(.gray)
+                    Image(systemName: "magnifyingglass")
+                        .font(.system(size: 9))
+                        .foregroundColor(.gray)
 
-                TextField("", text: $searchQuery)
-                    .textFieldStyle(.plain)
-                    .font(.system(size: 10))
-                    .frame(width: 80)
-                    .foregroundColor(.white)
-            }
-            .padding(.horizontal, 8)
+                    TextField("", text: $searchQuery)
+                        .textFieldStyle(.plain)
+                        .font(.system(size: 10))
+                        .frame(width: 80)
+                        .foregroundColor(.white)
+                }
+                .padding(.horizontal, 8)
 
-            // Clipboard cards horizontal scroll
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(filteredClipboard) { item in
-                        ClipboardCard(item: item) {
-                            clipboardManager.copyToClipboard(item)
-                        } onPin: {
-                            clipboardManager.togglePinned(item)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(filteredClipboard) { item in
+                            ClipboardCard(item: item) {
+                                clipboardManager.copyToClipboard(item)
+                            } onPin: {
+                                clipboardManager.togglePinned(item)
+                            }
                         }
                     }
+                    .scrollTargetLayout()
                 }
-                .scrollTargetLayout()
+                .scrollTargetBehavior(.viewAligned)
             }
-            .scrollTargetBehavior(.viewAligned)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)

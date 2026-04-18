@@ -19,13 +19,20 @@ struct AxisTasksView: View {
     @State private var pendingDetailTask: AxisTask? = nil
     @State private var detailOverlayVisible: Bool = false
 
+    @Default(.showVoiceInput) private var showVoiceInput
+    @Default(.showPomodoro) private var showPomodoro
+    @Default(.showStopwatch) private var showStopwatch
+    @Default(.showQuickNote) private var showQuickNote
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            // Voice input bar
+            // Voice input bar (always visible when Tasks tab is shown)
             HStack {
-                Image(systemName: "mic.fill")
-                    .foregroundColor(.red)
-                    .font(.system(size: 12))
+                if showVoiceInput {
+                    Image(systemName: "mic.fill")
+                        .foregroundColor(.red)
+                        .font(.system(size: 12))
+                }
 
                 TextField("Add task or tap mic...", text: $taskInput)
                     .textFieldStyle(.plain)
@@ -40,14 +47,16 @@ struct AxisTasksView: View {
                 .buttonStyle(.plain)
                 .disabled(taskInput.isEmpty || isProcessing)
 
-                Button(action: {
-                    VoiceInputManager.shared.toggle()
-                }) {
-                    Image(systemName: VoiceInputManager.shared.isListening ? "mic.fill" : "mic")
-                        .font(.system(size: 12))
-                        .foregroundColor(VoiceInputManager.shared.isListening ? .red : .gray)
+                if showVoiceInput {
+                    Button(action: {
+                        VoiceInputManager.shared.toggle()
+                    }) {
+                        Image(systemName: VoiceInputManager.shared.isListening ? "mic.fill" : "mic")
+                            .font(.system(size: 12))
+                            .foregroundColor(VoiceInputManager.shared.isListening ? .red : .gray)
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
             .padding(8)
             .background(Color.white.opacity(0.1))
@@ -68,14 +77,17 @@ struct AxisTasksView: View {
                         )
                     }
 
-                    // Pomodoro card
-                    CompactPomodoroCard()
+                    if showPomodoro {
+                        CompactPomodoroCard()
+                    }
 
-                    // Stopwatch card
-                    CompactStopwatchCard()
+                    if showStopwatch {
+                        CompactStopwatchCard()
+                    }
 
-                    // Note card
-                    CompactNoteCard()
+                    if showQuickNote {
+                        CompactNoteCard()
+                    }
                 }
                 .scrollTargetLayout()
             }
