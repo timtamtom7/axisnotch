@@ -31,6 +31,8 @@ struct ContentView: View {
 
     @State private var haptics: Bool = false
 
+    @State private var pomodoroFlash: Bool = false
+
     @Namespace var albumArtNamespace
 
     @Default(.useMusicVisualizer) var useMusicVisualizer
@@ -160,6 +162,12 @@ struct ContentView: View {
                             }
                         }
                     }
+                    .onReceive(NotificationCenter.default.publisher(for: .pomodoroComplete)) { _ in
+                        pomodoroFlash = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                            pomodoroFlash = false
+                        }
+                    }
                     .onChange(of: vm.notchState) { _, newState in
                         if newState == .closed && isHovering {
                             withAnimation {
@@ -199,6 +207,12 @@ struct ContentView: View {
                     Rectangle()
                         .fill(Color.black.opacity(0.01))
                         .frame(width: computedChinWidth, height: vm.chinHeight)
+                }
+
+                if pomodoroFlash {
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(Color.red, lineWidth: 3)
+                        .padding(-3)
                 }
             }
         }

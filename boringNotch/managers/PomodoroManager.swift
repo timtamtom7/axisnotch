@@ -67,7 +67,8 @@ final class PomodoroManager: ObservableObject {
         pause()
         sessionsCompleted += 1
 
-        // Flash notch border
+        // Play chime and flash notch border
+        AudioPlayer.shared.playChime()
         NotificationCenter.default.post(name: .pomodoroComplete, object: nil)
 
         #if os(iOS)

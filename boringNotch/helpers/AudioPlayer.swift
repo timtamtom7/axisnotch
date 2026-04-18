@@ -8,8 +8,16 @@
 import Foundation
 import AppKit
 
-class AudioPlayer {
+final class AudioPlayer {
+    static let shared = AudioPlayer()
+
+    private init() {}
+
     func play(fileName: String, fileExtension: String) {
-        NSSound(contentsOf:Bundle.main.url(forResource: fileName, withExtension: fileExtension)!, byReference: false)?.play()
+        NSSound(contentsOf: Bundle.main.url(forResource: fileName, withExtension: fileExtension)!, byReference: false)?.play()
+    }
+
+    func playChime() {
+        NSSound(named: "Glass")?.play()
     }
 }
