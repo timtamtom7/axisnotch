@@ -106,14 +106,25 @@
 		14E9FEAA2C70BF610062E83F /* DownloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E9FEA92C70BF610062E83F /* DownloadView.swift */; };
 		14E9FEAE2C7325770062E83F /* Button+Bouncing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E9FEAD2C7325770062E83F /* Button+Bouncing.swift */; };
 		14FC6E502C7DED5600C7BEA5 /* DataTypes+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14FC6E4F2C7DED5600C7BEA5 /* DataTypes+Extensions.swift */; };
+		183327783DD2D8C6D7BC45AB /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4589767747946500EFF5D31F /* StorageManager.swift */; };
+		1FFAAF7989462DA0D63A152B /* SystemInfoCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7BB9FCB7929669FDC9511B8 /* SystemInfoCard.swift */; };
+		2EFA1E291FC0C5CAD43B8A53 /* WorldClockManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C95D41FE4EA55AD54060DF41 /* WorldClockManager.swift */; };
 		38BC5707D10D4085FA023081 /* SystemInfoManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856FF537478AEB36B209EEEC /* SystemInfoManager.swift */; };
+		4E865BCF0BD45C87B513A2B2 /* WeatherCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AA84BACB1FDFAF12643E20D /* WeatherCard.swift */; };
 		507266DB2C908E2E00A2D00D /* HoverButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507266DA2C908E2E00A2D00D /* HoverButton.swift */; };
+		5367345729D6983B666370BD /* USBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D3D9AF0E327CCB64ABE25C2 /* USBManager.swift */; };
+		5882994F12E587DC4ED21FED /* WiFiManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB77D037A9381FA6B5E47137 /* WiFiManager.swift */; };
 		5917FD112E57891600E87F1C /* MediaKeyInterceptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5917FD102E57891600E87F1C /* MediaKeyInterceptor.swift */; };
 		5955950D2E900ED800C66711 /* ApplicationRelauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5955950C2E900ED800C66711 /* ApplicationRelauncher.swift */; };
 		59D8C23C2E589FAA00147B33 /* VolumeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59D8C23B2E589FAA00147B33 /* VolumeManager.swift */; };
 		64B9D757FE714CCECFC2C6C0 /* AxisFilesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89CBE038959CE238FA7790E /* AxisFilesView.swift */; };
+		6A3FF68F0199CA04D9A91C34 /* NotchControlCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8444039E407E17C8C3EC813A /* NotchControlCard.swift */; };
+		6AF2B8B7101592E39830FD47 /* ScreenshotCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98B1DBC33C2A6E5DDC97BD39 /* ScreenshotCard.swift */; };
 		716EAC5EC358BB18281B8372 /* WeatherManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AC0785BB35B4CD5E5659FE3 /* WeatherManager.swift */; };
+		7184775CDBFBF0440B2CACB1 /* USBDevicesCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B87C2A30464F8C544697FC3B /* USBDevicesCard.swift */; };
 		7870A1C7F49125149B36CA7D /* ClipboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB71F110A61BED6CE193FDC3 /* ClipboardManager.swift */; };
+		80A13D596F3DC635B61BE41E /* CalculatorCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5069FBAA0125188E73903361 /* CalculatorCard.swift */; };
+		8702BC5AAA37D1DBAB9651F2 /* StorageCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8569306334219C8304957F57 /* StorageCard.swift */; };
 		89AE6D01363AEF00EBBEADAB /* OllamaProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4793700336D7854AF49BA8FD /* OllamaProvider.swift */; };
 		97774B1BAF2699D97197E115 /* AxisTasksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64DA651E88243AF219B9747E /* AxisTasksView.swift */; };
 		9A0887322C7A693000C160EA /* TabButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A0887312C7A693000C160EA /* TabButton.swift */; };
@@ -152,6 +163,10 @@
 		B1FEB4992C7686630066EBBC /* PanGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1FEB4982C7686630066EBBC /* PanGesture.swift */; };
 		C1663A8EBA2D0A25FC7F6BA9 /* AppleIntelligenceProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74CE5D7543949F787E9E0B2F /* AppleIntelligenceProvider.swift */; };
 		CDD26606C873B73818D00DF3 /* AxisToolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 424EA4242918559817B1458A /* AxisToolsView.swift */; };
+		D860B72C5FEAA103746B0BF7 /* WiFiSharingCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 555AE9DE24FFDFFF17FC0085 /* WiFiSharingCard.swift */; };
+		DBDE19AD9648E05AB677B9FB /* WiFiSharingCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4105ABBF852E80C498432C29 /* WiFiSharingCard.swift */; };
+		E40D3F586A34E0756BC7DF0B /* AppLauncherCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154221F697B889053485BEEE /* AppLauncherCard.swift */; };
+		E53AAA08525DFFEF2E08A6ED /* WorldClockCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD24996CD915563A65EC7E6 /* WorldClockCard.swift */; };
 		EA7807126FC2C5A04BB1F777 /* CloudAPIProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69DC7B77D474886F51F9BA20 /* CloudAPIProvider.swift */; };
 		F38DE6482D8243E7008B5C6D /* BatteryActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F38DE6472D8243E2008B5C6D /* BatteryActivityManager.swift */; };
 		F3ECFF45F0C9891AD5F1678D /* AIParserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A304CAB21EE8797A24FBC1F /* AIParserService.swift */; };
@@ -289,18 +304,28 @@
 		14E9FEA92C70BF610062E83F /* DownloadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadView.swift; sourceTree = "<group>"; };
 		14E9FEAD2C7325770062E83F /* Button+Bouncing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Button+Bouncing.swift"; sourceTree = "<group>"; };
 		14FC6E4F2C7DED5600C7BEA5 /* DataTypes+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DataTypes+Extensions.swift"; sourceTree = "<group>"; };
+		154221F697B889053485BEEE /* AppLauncherCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppLauncherCard.swift; sourceTree = "<group>"; };
 		17E6A01F8D7AB20E96C3003A /* AxisFilesView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AxisFilesView.swift; sourceTree = "<group>"; };
+		2AA84BACB1FDFAF12643E20D /* WeatherCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WeatherCard.swift; sourceTree = "<group>"; };
 		3A304CAB21EE8797A24FBC1F /* AIParserService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AIParserService.swift; path = services/ai/AIParserService.swift; sourceTree = "<group>"; };
+		4105ABBF852E80C498432C29 /* WiFiSharingCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WiFiSharingCard.swift; sourceTree = "<group>"; };
 		424EA4242918559817B1458A /* AxisToolsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AxisToolsView.swift; sourceTree = "<group>"; };
+		4589767747946500EFF5D31F /* StorageManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
 		4793700336D7854AF49BA8FD /* OllamaProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OllamaProvider.swift; path = services/ai/OllamaProvider.swift; sourceTree = "<group>"; };
+		5069FBAA0125188E73903361 /* CalculatorCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CalculatorCard.swift; sourceTree = "<group>"; };
 		507266DA2C908E2E00A2D00D /* HoverButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoverButton.swift; sourceTree = "<group>"; };
+		555AE9DE24FFDFFF17FC0085 /* WiFiSharingCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WiFiSharingCard.swift; sourceTree = "<group>"; };
 		5917FD102E57891600E87F1C /* MediaKeyInterceptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaKeyInterceptor.swift; sourceTree = "<group>"; };
 		5955950C2E900ED800C66711 /* ApplicationRelauncher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationRelauncher.swift; sourceTree = "<group>"; };
 		59D8C23B2E589FAA00147B33 /* VolumeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolumeManager.swift; sourceTree = "<group>"; };
+		5D3D9AF0E327CCB64ABE25C2 /* USBManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = USBManager.swift; sourceTree = "<group>"; };
 		64DA651E88243AF219B9747E /* AxisTasksView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AxisTasksView.swift; sourceTree = "<group>"; };
 		69DC7B77D474886F51F9BA20 /* CloudAPIProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CloudAPIProvider.swift; path = services/ai/CloudAPIProvider.swift; sourceTree = "<group>"; };
 		74CE5D7543949F787E9E0B2F /* AppleIntelligenceProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppleIntelligenceProvider.swift; path = services/ai/AppleIntelligenceProvider.swift; sourceTree = "<group>"; };
+		8444039E407E17C8C3EC813A /* NotchControlCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NotchControlCard.swift; sourceTree = "<group>"; };
+		8569306334219C8304957F57 /* StorageCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StorageCard.swift; sourceTree = "<group>"; };
 		856FF537478AEB36B209EEEC /* SystemInfoManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SystemInfoManager.swift; sourceTree = "<group>"; };
+		98B1DBC33C2A6E5DDC97BD39 /* ScreenshotCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ScreenshotCard.swift; sourceTree = "<group>"; };
 		9A0887312C7A693000C160EA /* TabButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabButton.swift; sourceTree = "<group>"; };
 		9A0887342C7AFF8E00C160EA /* TabSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabSelectionView.swift; sourceTree = "<group>"; };
 		9A987A032C73CA66005CA465 /* ShelfView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShelfView.swift; sourceTree = "<group>"; };
@@ -331,9 +356,14 @@
 		B1F0A0012E60000100000001 /* BrightnessManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrightnessManager.swift; sourceTree = "<group>"; };
 		B1F747F82EC7E94000F841DB /* LottieView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottieView.swift; sourceTree = "<group>"; };
 		B1FEB4982C7686630066EBBC /* PanGesture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanGesture.swift; sourceTree = "<group>"; };
+		B87C2A30464F8C544697FC3B /* USBDevicesCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = USBDevicesCard.swift; sourceTree = "<group>"; };
 		B89CBE038959CE238FA7790E /* AxisFilesView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AxisFilesView.swift; sourceTree = "<group>"; };
+		C95D41FE4EA55AD54060DF41 /* WorldClockManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WorldClockManager.swift; sourceTree = "<group>"; };
 		CB71F110A61BED6CE193FDC3 /* ClipboardManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ClipboardManager.swift; sourceTree = "<group>"; };
+		D7BB9FCB7929669FDC9511B8 /* SystemInfoCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SystemInfoCard.swift; sourceTree = "<group>"; };
 		F38DE6472D8243E2008B5C6D /* BatteryActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryActivityManager.swift; sourceTree = "<group>"; };
+		FAD24996CD915563A65EC7E6 /* WorldClockCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WorldClockCard.swift; sourceTree = "<group>"; };
+		FB77D037A9381FA6B5E47137 /* WiFiManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WiFiManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -569,6 +599,10 @@
 				A1B2C3D4E5F6A1B2C3D4E5F9 /* VoiceInputManager.swift */,
 				0AC0785BB35B4CD5E5659FE3 /* WeatherManager.swift */,
 				856FF537478AEB36B209EEEC /* SystemInfoManager.swift */,
+				C95D41FE4EA55AD54060DF41 /* WorldClockManager.swift */,
+				5D3D9AF0E327CCB64ABE25C2 /* USBManager.swift */,
+				4589767747946500EFF5D31F /* StorageManager.swift */,
+				FB77D037A9381FA6B5E47137 /* WiFiManager.swift */,
 			);
 			path = managers;
 			sourceTree = "<group>";
@@ -718,6 +752,17 @@
 				B89CBE038959CE238FA7790E /* AxisFilesView.swift */,
 				424EA4242918559817B1458A /* AxisToolsView.swift */,
 				17E6A01F8D7AB20E96C3003A /* AxisFilesView.swift */,
+				4105ABBF852E80C498432C29 /* WiFiSharingCard.swift */,
+				154221F697B889053485BEEE /* AppLauncherCard.swift */,
+				5069FBAA0125188E73903361 /* CalculatorCard.swift */,
+				8444039E407E17C8C3EC813A /* NotchControlCard.swift */,
+				98B1DBC33C2A6E5DDC97BD39 /* ScreenshotCard.swift */,
+				8569306334219C8304957F57 /* StorageCard.swift */,
+				D7BB9FCB7929669FDC9511B8 /* SystemInfoCard.swift */,
+				B87C2A30464F8C544697FC3B /* USBDevicesCard.swift */,
+				2AA84BACB1FDFAF12643E20D /* WeatherCard.swift */,
+				555AE9DE24FFDFFF17FC0085 /* WiFiSharingCard.swift */,
+				FAD24996CD915563A65EC7E6 /* WorldClockCard.swift */,
 			);
 			path = Tabs;
 			sourceTree = "<group>";
@@ -1105,6 +1150,21 @@
 				EA7807126FC2C5A04BB1F777 /* CloudAPIProvider.swift in Sources */,
 				716EAC5EC358BB18281B8372 /* WeatherManager.swift in Sources */,
 				38BC5707D10D4085FA023081 /* SystemInfoManager.swift in Sources */,
+				2EFA1E291FC0C5CAD43B8A53 /* WorldClockManager.swift in Sources */,
+				5367345729D6983B666370BD /* USBManager.swift in Sources */,
+				183327783DD2D8C6D7BC45AB /* StorageManager.swift in Sources */,
+				5882994F12E587DC4ED21FED /* WiFiManager.swift in Sources */,
+				DBDE19AD9648E05AB677B9FB /* WiFiSharingCard.swift in Sources */,
+				E40D3F586A34E0756BC7DF0B /* AppLauncherCard.swift in Sources */,
+				80A13D596F3DC635B61BE41E /* CalculatorCard.swift in Sources */,
+				6A3FF68F0199CA04D9A91C34 /* NotchControlCard.swift in Sources */,
+				6AF2B8B7101592E39830FD47 /* ScreenshotCard.swift in Sources */,
+				8702BC5AAA37D1DBAB9651F2 /* StorageCard.swift in Sources */,
+				1FFAAF7989462DA0D63A152B /* SystemInfoCard.swift in Sources */,
+				7184775CDBFBF0440B2CACB1 /* USBDevicesCard.swift in Sources */,
+				4E865BCF0BD45C87B513A2B2 /* WeatherCard.swift in Sources */,
+				D860B72C5FEAA103746B0BF7 /* WiFiSharingCard.swift in Sources */,
+				E53AAA08525DFFEF2E08A6ED /* WorldClockCard.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

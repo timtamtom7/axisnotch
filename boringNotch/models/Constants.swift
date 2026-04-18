@@ -224,6 +224,7 @@ extension Defaults.Keys {
     static let showAppLauncher = Key<Bool>("showAppLauncher", default: true)
     static let showWaterTracker = Key<Bool>("showWaterTracker", default: true)
     static let showToolsTab = Key<Bool>("showToolsTab", default: true)
+    static let showWiFiSharing = Key<Bool>("showWiFiSharing", default: false)
 
     // MARK: Weather Settings
     static let weatherAPIKey = Key<String>("weatherAPIKey", default: "")
