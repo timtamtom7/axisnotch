@@ -67,6 +67,21 @@ class BoringViewModel: NSObject, ObservableObject {
             .store(in: &cancellables)
         
         setupDetectorObserver()
+        setupTabObserver()
+    }
+
+    private func setupTabObserver() {
+        coordinator.$currentView
+            .sink { [weak self] view in
+                guard let self = self, self.notchState == .open else { return }
+                self.notchSize = self.idealOpenSize(for: view)
+                NotificationCenter.default.post(name: .notchHeightChanged, object: nil)
+            }
+            .store(in: &cancellables)
+    }
+
+    func idealOpenSize(for view: NotchViews) -> CGSize {
+        return axisTabSizes[view] ?? openNotchSize
     }
     
     private func setupDetectorObserver() {
@@ -190,7 +205,7 @@ class BoringViewModel: NSObject, ObservableObject {
     }
 
     func open() {
-        self.notchSize = openNotchSize
+        self.notchSize = idealOpenSize(for: coordinator.currentView)
         self.notchState = .open
         
         // Force music information update when notch is opened

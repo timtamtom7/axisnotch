@@ -22,14 +22,16 @@ struct ShelfView: View {
     private let spacing: CGFloat = 8
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // Files section
+        VStack(alignment: .leading, spacing: 6) {
+            // Files section — fixed height row
             HStack(spacing: 12) {
                 FileShareView()
                     .aspectRatio(1, contentMode: .fit)
+                    .frame(height: 100)
                     .environmentObject(vm)
 
                 panel
+                    .frame(height: 100)
                     .onDrop(of: [.fileURL, .url, .utf8PlainText, .plainText, .data], isTargeted: $vm.dragDetectorTargeting) { providers in
                         handleDrop(providers: providers)
                     }
@@ -42,29 +44,28 @@ struct ShelfView: View {
                 // Clipboard section
                 HStack(spacing: 6) {
                     Image(systemName: "clipboard")
-                        .font(.system(size: 10))
+                        .font(.system(size: 9))
                         .foregroundColor(.gray)
 
                     Text("Clipboard")
-                        .font(.system(size: 10, weight: .semibold))
+                        .font(.system(size: 9, weight: .semibold))
                         .foregroundColor(.gray)
 
                     Spacer()
 
                     Image(systemName: "magnifyingglass")
-                        .font(.system(size: 9))
+                        .font(.system(size: 8))
                         .foregroundColor(.gray)
 
                     TextField("", text: $searchQuery)
                         .textFieldStyle(.plain)
-                        .font(.system(size: 10))
-                        .frame(width: 80)
+                        .font(.system(size: 9))
+                        .frame(width: 70)
                         .foregroundColor(.white)
                 }
-                .padding(.horizontal, 8)
 
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
+                    HStack(spacing: 6) {
                         ForEach(filteredClipboard) { item in
                             ClipboardCard(item: item) {
                                 clipboardManager.copyToClipboard(item)
@@ -208,8 +209,8 @@ struct ClipboardCard: View {
                 .buttonStyle(.plain)
             }
         }
-        .padding(8)
-        .frame(width: 120, height: 80)
+        .padding(6)
+        .frame(width: 110, height: 70)
         .background(Color.white.opacity(0.08))
         .cornerRadius(8)
         .overlay(

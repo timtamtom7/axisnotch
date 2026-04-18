@@ -270,12 +270,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             window.alphaValue = 0
         }
 
-        let screenFrame = screen.frame
-        window.setFrameOrigin(
-            NSPoint(
-                x: screenFrame.origin.x + (screenFrame.width / 2) - window.frame.width / 2,
-                y: screenFrame.origin.y + screenFrame.height - window.frame.height
-            ))
+        let viewModel = viewModels[screen.displayUUID ?? ""]
+        let size = CGSize(
+            width: (viewModel?.notchSize.width ?? openNotchSize.width) + shadowPadding,
+            height: (viewModel?.notchSize.height ?? openNotchSize.height) + shadowPadding
+        )
+        let origin = NSPoint(
+            x: screen.frame.origin.x + (screen.frame.width / 2) - size.width / 2,
+            y: screen.frame.origin.y + screen.frame.height - size.height
+        )
+        window.setFrame(NSRect(origin: origin, size: size), display: true)
         window.alphaValue = 1
     }
 
