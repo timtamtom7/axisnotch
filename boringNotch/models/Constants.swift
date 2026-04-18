@@ -225,6 +225,13 @@ extension Defaults.Keys {
     static let showWaterTracker = Key<Bool>("showWaterTracker", default: true)
     static let showToolsTab = Key<Bool>("showToolsTab", default: true)
 
+    // MARK: Weather Settings
+    static let weatherAPIKey = Key<String>("weatherAPIKey", default: "")
+    static let weatherUnits = Key<String>("weatherUnits", default: "imperial")
+
+    // MARK: Screenshot Settings
+    static let screenshotDestination = Key<String>("screenshotDestination", default: "clipboard")
+
     // MARK: AI Provider
     static let aiProvider = Key<String>("aiProvider", default: "appleIntelligence")
 }

@@ -106,11 +106,13 @@
 		14E9FEAA2C70BF610062E83F /* DownloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E9FEA92C70BF610062E83F /* DownloadView.swift */; };
 		14E9FEAE2C7325770062E83F /* Button+Bouncing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E9FEAD2C7325770062E83F /* Button+Bouncing.swift */; };
 		14FC6E502C7DED5600C7BEA5 /* DataTypes+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14FC6E4F2C7DED5600C7BEA5 /* DataTypes+Extensions.swift */; };
+		38BC5707D10D4085FA023081 /* SystemInfoManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856FF537478AEB36B209EEEC /* SystemInfoManager.swift */; };
 		507266DB2C908E2E00A2D00D /* HoverButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507266DA2C908E2E00A2D00D /* HoverButton.swift */; };
 		5917FD112E57891600E87F1C /* MediaKeyInterceptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5917FD102E57891600E87F1C /* MediaKeyInterceptor.swift */; };
 		5955950D2E900ED800C66711 /* ApplicationRelauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5955950C2E900ED800C66711 /* ApplicationRelauncher.swift */; };
 		59D8C23C2E589FAA00147B33 /* VolumeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59D8C23B2E589FAA00147B33 /* VolumeManager.swift */; };
 		64B9D757FE714CCECFC2C6C0 /* AxisFilesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89CBE038959CE238FA7790E /* AxisFilesView.swift */; };
+		716EAC5EC358BB18281B8372 /* WeatherManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AC0785BB35B4CD5E5659FE3 /* WeatherManager.swift */; };
 		7870A1C7F49125149B36CA7D /* ClipboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB71F110A61BED6CE193FDC3 /* ClipboardManager.swift */; };
 		89AE6D01363AEF00EBBEADAB /* OllamaProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4793700336D7854AF49BA8FD /* OllamaProvider.swift */; };
 		97774B1BAF2699D97197E115 /* AxisTasksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64DA651E88243AF219B9747E /* AxisTasksView.swift */; };
@@ -191,6 +193,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0AC0785BB35B4CD5E5659FE3 /* WeatherManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WeatherManager.swift; sourceTree = "<group>"; };
 		1100290B2E847E2800035A57 /* NSItemProvider+LoadHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSItemProvider+LoadHelpers.swift"; sourceTree = "<group>"; };
 		110029262E84FD4C00035A57 /* TemporaryFileStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemporaryFileStorageService.swift; sourceTree = "<group>"; };
 		110029292E8691B400035A57 /* FileShareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileShareView.swift; sourceTree = "<group>"; };
@@ -297,6 +300,7 @@
 		64DA651E88243AF219B9747E /* AxisTasksView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AxisTasksView.swift; sourceTree = "<group>"; };
 		69DC7B77D474886F51F9BA20 /* CloudAPIProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CloudAPIProvider.swift; path = services/ai/CloudAPIProvider.swift; sourceTree = "<group>"; };
 		74CE5D7543949F787E9E0B2F /* AppleIntelligenceProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppleIntelligenceProvider.swift; path = services/ai/AppleIntelligenceProvider.swift; sourceTree = "<group>"; };
+		856FF537478AEB36B209EEEC /* SystemInfoManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SystemInfoManager.swift; sourceTree = "<group>"; };
 		9A0887312C7A693000C160EA /* TabButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabButton.swift; sourceTree = "<group>"; };
 		9A0887342C7AFF8E00C160EA /* TabSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabSelectionView.swift; sourceTree = "<group>"; };
 		9A987A032C73CA66005CA465 /* ShelfView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShelfView.swift; sourceTree = "<group>"; };
@@ -563,6 +567,8 @@
 				A1B2C3D4E5F6A1B2C3D4E5F6 /* PomodoroManager.swift */,
 				CB71F110A61BED6CE193FDC3 /* ClipboardManager.swift */,
 				A1B2C3D4E5F6A1B2C3D4E5F9 /* VoiceInputManager.swift */,
+				0AC0785BB35B4CD5E5659FE3 /* WeatherManager.swift */,
+				856FF537478AEB36B209EEEC /* SystemInfoManager.swift */,
 			);
 			path = managers;
 			sourceTree = "<group>";
@@ -1097,6 +1103,8 @@
 				C1663A8EBA2D0A25FC7F6BA9 /* AppleIntelligenceProvider.swift in Sources */,
 				89AE6D01363AEF00EBBEADAB /* OllamaProvider.swift in Sources */,
 				EA7807126FC2C5A04BB1F777 /* CloudAPIProvider.swift in Sources */,
+				716EAC5EC358BB18281B8372 /* WeatherManager.swift in Sources */,
+				38BC5707D10D4085FA023081 /* SystemInfoManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
