@@ -13,6 +13,7 @@ struct CalendarAlertView: View {
     @EnvironmentObject var vm: BoringViewModel
     @State private var isExpanded: Bool = false
     @State private var timeRemaining: Int = 0
+    @State private var timerCancellable: AnyCancellable?
 
     var body: some View {
         if calendarManager.showCalendarAlert, let event = calendarManager.upcomingAlertEvent {
@@ -74,9 +75,15 @@ struct CalendarAlertView: View {
             .transition(.move(edge: .top).combined(with: .opacity))
             .onAppear {
                 updateTimeRemaining()
+                timerCancellable = Timer.publish(every: 1, on: .main, in: .common)
+                    .autoconnect()
+                    .sink { _ in
+                        updateTimeRemaining()
+                    }
             }
-            .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
-                updateTimeRemaining()
+            .onDisappear {
+                timerCancellable?.cancel()
+                timerCancellable = nil
             }
         }
     }

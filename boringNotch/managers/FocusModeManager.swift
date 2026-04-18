@@ -17,12 +17,16 @@ class FocusModeManager: ObservableObject {
     @Published var focusName: String = "Focus"
     @Published var isDNDEnabled: Bool = false
 
-    private var observer: AnyObject?
     private var cancellables = Set<AnyCancellable>()
 
     private init() {
         setupNotifications()
         updateFocusState()
+    }
+
+    deinit {
+        DistributedNotificationCenter.default().removeObserver(self)
+        NSWorkspace.shared.notificationCenter.removeObserver(self)
     }
 
     private func setupNotifications() {

@@ -46,12 +46,11 @@ final class PomodoroManager: ObservableObject {
         timerTask = Task {
             while !Task.isCancelled && isRunning && secondsRemaining > 0 {
                 try? await Task.sleep(for: .seconds(1))
-                if !Task.isCancelled {
-                    await MainActor.run {
-                        self.secondsRemaining -= 1
-                        if self.secondsRemaining == 0 {
-                            self.onSessionComplete()
-                        }
+                guard !Task.isCancelled else { break }
+                await MainActor.run {
+                    self.secondsRemaining -= 1
+                    if self.secondsRemaining == 0 {
+                        self.onSessionComplete()
                     }
                 }
             }
