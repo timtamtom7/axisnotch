@@ -247,4 +247,22 @@ extension Defaults.Keys {
 
     // MARK: Battery Details
     static let showBatteryDetails = Key<Bool>("showBatteryDetails", default: true)
+
+    // MARK: Notifications
+    static let showNotifications = Key<Bool>("showNotifications", default: true)
+
+    // MARK: Screenshot History
+    static let showScreenshotHistory = Key<Bool>("showScreenshotHistory", default: true)
+
+    // MARK: App Cleaner
+    static let showAppCleaner = Key<Bool>("showAppCleaner", default: true)
+
+    // MARK: Lock Sounds
+    static let playLockSounds = Key<Bool>("playLockSounds", default: true)
+
+    // MARK: Quick Notes
+    static let quickNotesLimit = Key<Int>("quickNotesLimit", default: 10)
+
+    // MARK: Pomodoro
+    static let pomodoroGoalPerDay = Key<Int>("pomodoroGoalPerDay", default: 8)
 }

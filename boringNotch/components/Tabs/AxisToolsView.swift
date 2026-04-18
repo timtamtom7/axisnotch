@@ -21,6 +21,8 @@ struct AxisToolsView: View {
     @Default(.showStorageInfo) private var showStorageInfo
     @Default(.showAppLauncher) private var showAppLauncher
     @Default(.showWiFiSharing) private var showWiFiSharing
+    @Default(.showScreenshotHistory) private var showScreenshotHistory
+    @Default(.showAppCleaner) private var showAppCleaner
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -29,11 +31,13 @@ struct AxisToolsView: View {
                 if showSystemInfo { SystemInfoCard() }
                 if showWeather { WeatherCard() }
                 if showScreenshot { ScreenshotCard() }
+                if showScreenshotHistory { ScreenshotHistoryCard() }
                 if showWorldClock { WorldClockCard() }
                 if showUSBDevices { USBDevicesCard() }
                 if showNotchControl { NotchControlCard(onHide: { vm.close() }, onShow: { vm.open() }) }
                 if showStorageInfo { StorageCard() }
                 if showAppLauncher { AppLauncherCard() }
+                if showAppCleaner { CleanerCard() }
                 if showWiFiSharing { WiFiSharingCard() }
             }
             .padding(.horizontal, 16)

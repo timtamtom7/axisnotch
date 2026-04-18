@@ -178,12 +178,14 @@ struct ClipboardCard: View {
     let onCopy: () -> Void
     let onPin: () -> Void
 
+    @State private var isExpanded: Bool = false
+
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(item.content)
                 .font(.system(size: 10))
                 .foregroundColor(.white)
-                .lineLimit(3)
+                .lineLimit(isExpanded ? 6 : 3)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             Spacer()
@@ -210,7 +212,7 @@ struct ClipboardCard: View {
             }
         }
         .padding(6)
-        .frame(width: 110, height: 70)
+        .frame(width: isExpanded ? 150 : 110, height: isExpanded ? 100 : 70)
         .background(Color.white.opacity(0.08))
         .cornerRadius(8)
         .overlay(
@@ -219,6 +221,23 @@ struct ClipboardCard: View {
         )
         .onTapGesture {
             onCopy()
+        }
+        .onTapGesture(count: 2) {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                isExpanded.toggle()
+            }
+        }
+        .contextMenu {
+            Button(action: onCopy) {
+                Label("Copy", systemImage: "doc.on.doc")
+            }
+            Button(action: onPin) {
+                Label(item.isPinned ? "Unpin" : "Pin", systemImage: item.isPinned ? "pin.slash" : "pin")
+            }
+            Divider()
+            Button(role: .destructive, action: {}) {
+                Label("Delete", systemImage: "trash")
+            }
         }
     }
 

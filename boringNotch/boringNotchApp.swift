@@ -91,6 +91,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @MainActor
     func onScreenLocked(_ notification: Notification) {
         isScreenLocked = true
+        playLockSound()
         if !Defaults[.showOnLockScreen] {
             cleanupWindows()
         } else {
@@ -101,11 +102,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @MainActor
     func onScreenUnlocked(_ notification: Notification) {
         isScreenLocked = false
+        playUnlockSound()
         if !Defaults[.showOnLockScreen] {
             adjustWindowPosition(changeAlpha: true)
         } else {
             disableSkyLightOnAllWindows()
         }
+    }
+
+    private func playLockSound() {
+        guard Defaults[.playLockSounds] else { return }
+        NSSound(named: "Glass")?.play()
+    }
+
+    private func playUnlockSound() {
+        guard Defaults[.playLockSounds] else { return }
+        NSSound(named: "Glass")?.play()
     }
     
     @MainActor

@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Defaults
+import Combine
 
 struct CalendarAlertView: View {
     @ObservedObject var calendarManager = CalendarManager.shared

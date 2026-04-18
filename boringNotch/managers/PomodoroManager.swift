@@ -74,6 +74,9 @@ final class PomodoroManager: ObservableObject {
         pause()
         sessionsCompleted += 1
 
+        // Record session to history
+        PomodoroHistoryManager.shared.recordSession()
+
         // Play chime and flash notch border
         AudioPlayer.shared.playChime()
         NotificationCenter.default.post(name: .pomodoroComplete, object: nil)

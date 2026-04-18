@@ -10,6 +10,22 @@ import Combine
 import Defaults
 import SwiftUI
 
+// MARK: - Notification Display in Notch
+
+struct NotificationInNotchView: View {
+    @ObservedObject var notificationManager = NotificationManager.shared
+    @Default(.showNotifications) private var showNotifications
+
+    var body: some View {
+        if showNotifications && notificationManager.isNotificationVisible {
+            NotificationBannerView()
+                .padding(.horizontal, 12)
+                .padding(.bottom, 4)
+                .transition(.move(edge: .top).combined(with: .opacity))
+        }
+    }
+}
+
 // MARK: - Music Player Components
 
 struct MusicPlayerView: View {
@@ -429,6 +445,8 @@ struct NotchHomeView: View {
         Group {
             if !coordinator.firstLaunch {
                 VStack(spacing: 8) {
+                    NotificationInNotchView()
+
                     CalendarAlertView()
 
                     mainContent
