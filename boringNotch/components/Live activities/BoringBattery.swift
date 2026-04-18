@@ -197,6 +197,7 @@ struct BoringBatteryView: View {
                     Text("\(Int32(levelBattery))%")
                         .font(.callout)
                         .foregroundStyle(.white)
+                        .lineLimit(1)
                 }
                 BatteryView(
                     levelBattery: levelBattery,
