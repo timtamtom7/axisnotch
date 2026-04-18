@@ -201,6 +201,9 @@
         }
       }
     },
+    "-" : {
+
+    },
     "'%@'?" : {
 
     },
@@ -704,7 +707,28 @@
         }
       }
     },
+    "%@ / %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ / %2$@"
+          }
+        }
+      }
+    },
+    "%@ / %@ used" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ / %2$@ used"
+          }
+        }
+      }
+    },
     "%d%%" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -900,6 +924,16 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "%lld"
+          }
+        }
+      }
+    },
+    "%lld/%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld/%2$lld"
           }
         }
       }
@@ -1307,7 +1341,7 @@
         }
       }
     },
-    "256GB / 512GB used" : {
+    "+%lld more" : {
 
     },
     "About" : {
@@ -1810,7 +1844,10 @@
         }
       }
     },
-    "Add details" : {
+    "Add App" : {
+
+    },
+    "Add City" : {
 
     },
     "Add manually" : {
@@ -2014,7 +2051,10 @@
         }
       }
     },
-    "Add task or tap mic..." : {
+    "Add Note" : {
+
+    },
+    "Add task..." : {
 
     },
     "Additional features" : {
@@ -2827,6 +2867,15 @@
 
     },
     "Apps" : {
+
+    },
+    "Apps: %@" : {
+
+    },
+    "Are you sure you want to remove %@?" : {
+
+    },
+    "Authorization Required" : {
 
     },
     "Auto-scroll to next event" : {
@@ -3929,6 +3978,15 @@
         }
       }
     },
+    "Browser: %@" : {
+
+    },
+    "Cache Cleaned" : {
+
+    },
+    "Cache cleanup completed successfully." : {
+
+    },
     "Calculator" : {
 
     },
@@ -4333,6 +4391,9 @@
       }
     },
     "Capture" : {
+
+    },
+    "Captured!" : {
 
     },
     "Change media with horizontal gestures" : {
@@ -5235,6 +5296,18 @@
         }
       }
     },
+    "Clean" : {
+
+    },
+    "Clean All" : {
+
+    },
+    "Clean Cache" : {
+
+    },
+    "Cleaner" : {
+
+    },
     "Clear slot" : {
       "localizations" : {
         "ar" : {
@@ -6040,6 +6113,9 @@
           }
         }
       }
+    },
+    "Copy" : {
+
     },
     "Copy items on drag" : {
       "localizations" : {
@@ -7041,6 +7117,9 @@
         }
       }
     },
+    "Daily Goal:" : {
+
+    },
     "Default" : {
       "localizations" : {
         "ar" : {
@@ -7140,6 +7219,9 @@
           }
         }
       }
+    },
+    "Delete" : {
+
     },
     "Description" : {
       "extractionState" : "stale",
@@ -7241,6 +7323,9 @@
           }
         }
       }
+    },
+    "Details" : {
+
     },
     "Disable" : {
       "extractionState" : "stale",
@@ -7443,6 +7528,9 @@
           }
         }
       }
+    },
+    "Done" : {
+
     },
     "Download" : {
       "localizations" : {
@@ -7945,6 +8033,9 @@
         }
       }
     },
+    "Due:" : {
+
+    },
     "Easily copy, store, and manage your most-used content. Upgrade now for advanced features like multi-item storage and quick access!" : {
       "localizations" : {
         "ar" : {
@@ -8045,6 +8136,9 @@
         }
       }
     },
+    "Edit" : {
+
+    },
     "Edit layout" : {
       "localizations" : {
         "ar" : {
@@ -8144,6 +8238,9 @@
           }
         }
       }
+    },
+    "Eject" : {
+
     },
     "Enable blur effect behind album art" : {
       "localizations" : {
@@ -14451,6 +14548,9 @@
         }
       }
     },
+    "Network: %@" : {
+
+    },
     "Never hide" : {
       "localizations" : {
         "ar" : {
@@ -14551,7 +14651,7 @@
         }
       }
     },
-    "No" : {
+    "No cities added" : {
 
     },
     "No custom animation available" : {
@@ -14753,6 +14853,9 @@
           }
         }
       }
+    },
+    "No devices" : {
+
     },
     "No events" : {
       "localizations" : {
@@ -15055,7 +15158,13 @@
         }
       }
     },
-    "No tasks — tap mic or type above" : {
+    "No screenshots" : {
+
+    },
+    "No tasks — speak or type above" : {
+
+    },
+    "Not Connected" : {
 
     },
     "Not Now" : {
@@ -15561,7 +15670,10 @@
         }
       }
     },
-    "Note" : {
+    "Notes" : {
+
+    },
+    "OK" : {
 
     },
     "Ollama (Local)" : {
@@ -16167,6 +16279,9 @@
         }
       }
     },
+    "Password: " : {
+
+    },
     "Pick a Color" : {
       "localizations" : {
         "ar" : {
@@ -16266,6 +16381,9 @@
           }
         }
       }
+    },
+    "Pin" : {
+
     },
     "Plugged In" : {
       "localizations" : {
@@ -16470,6 +16588,9 @@
         }
       }
     },
+    "Priority:" : {
+
+    },
     "Progress bar style" : {
       "localizations" : {
         "ar" : {
@@ -16569,6 +16690,9 @@
           }
         }
       }
+    },
+    "Quick Notes" : {
+
     },
     "Quick Share" : {
       "localizations" : {
@@ -16970,6 +17094,9 @@
         }
       }
     },
+    "Recent Files" : {
+
+    },
     "Release name" : {
       "localizations" : {
         "ar" : {
@@ -17369,6 +17496,18 @@
           }
         }
       }
+    },
+    "Remove" : {
+
+    },
+    "Remove %@" : {
+
+    },
+    "Remove City" : {
+
+    },
+    "Remove from Launcher" : {
+
     },
     "Remove from shelf after dragging" : {
       "localizations" : {
@@ -18172,7 +18311,19 @@
         }
       }
     },
+    "Scan to share" : {
+
+    },
     "Screenshot" : {
+
+    },
+    "Screenshots" : {
+
+    },
+    "Search apps..." : {
+
+    },
+    "Search cities..." : {
 
     },
     "Search clipboard..." : {
@@ -18478,6 +18629,9 @@
         }
       }
     },
+    "sessions today" : {
+
+    },
     "Settings" : {
       "localizations" : {
         "ar" : {
@@ -18577,6 +18731,9 @@
           }
         }
       }
+    },
+    "Share" : {
+
     },
     "Shelf" : {
       "localizations" : {
@@ -20338,6 +20495,9 @@
     "Show World Clock" : {
 
     },
+    "Skip" : {
+
+    },
     "Slider color" : {
       "localizations" : {
         "ar" : {
@@ -21346,10 +21506,16 @@
         }
       }
     },
+    "Tap + to add note" : {
+
+    },
     "Tasks & Tools" : {
 
     },
     "Tasks Tab" : {
+
+    },
+    "This will remove browser caches, app caches, and logs. Some data may be recreated on next launch." : {
 
     },
     "Time to Full Charge: %lld min" : {
@@ -21452,6 +21618,9 @@
         }
       }
     },
+    "Time:" : {
+
+    },
     "Tint progress bar with accent color" : {
       "localizations" : {
         "ar" : {
@@ -21551,6 +21720,9 @@
           }
         }
       }
+    },
+    "Title" : {
+
     },
     "Toggle Notch Open:" : {
       "localizations" : {
@@ -21753,6 +21925,9 @@
       }
     },
     "Tools Tab" : {
+
+    },
+    "Total:" : {
 
     },
     "Two-finger swipe up on notch to close, two-finger swipe down on notch to open when **Open notch on hover** option is disabled" : {
@@ -22255,6 +22430,12 @@
           }
         }
       }
+    },
+    "Unpin" : {
+
+    },
+    "Update Note" : {
+
     },
     "Upgrade to Pro" : {
       "localizations" : {
@@ -22962,6 +23143,9 @@
     "Weather" : {
 
     },
+    "Weekly Progress" : {
+
+    },
     "Welcome" : {
       "localizations" : {
         "ar" : {
@@ -23161,6 +23345,12 @@
           }
         }
       }
+    },
+    "WiFi Share" : {
+
+    },
+    "WiFi Sharing" : {
+
     },
     "Window Appearance" : {
       "localizations" : {
@@ -23363,9 +23553,6 @@
       }
     },
     "World Clock" : {
-
-    },
-    "Yes" : {
 
     },
     "You can now enjoy the app. If you want to tweak things further, you can always visit the settings." : {
