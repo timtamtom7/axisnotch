@@ -199,4 +199,8 @@ extension Defaults.Keys {
     }
 
     static let didClearLegacyURLCacheV1 = Key<Bool>("didClearLegacyURLCache_v1", default: false)
+
+    // MARK: AI Parser
+    static let cloudAPIEndpoint = Key<String>("cloudAPIEndpoint", default: "")
+    static let cloudAPIKey = Key<String>("cloudAPIKey", default: "")
 }
