@@ -9,6 +9,7 @@ import Foundation
 import IOKit
 import IOKit.usb
 import Combine
+import AppKit
 
 final class USBManager: ObservableObject {
     static let shared = USBManager()
@@ -44,9 +45,64 @@ final class USBManager: ObservableObject {
     }
 
     func ejectDevice(_ device: USBDevice) {
-        // Note: Ejecting USB devices programmatically requires more complex IOKit handling
-        // This is a placeholder for the eject functionality
-        print("Request to eject: \(device.name)")
+        // Find volumes associated with this device and eject them
+        let fileManager = FileManager.default
+        let volumeURLs = fileManager.mountedVolumeURLs(
+            includingResourceValuesForKeys: [.volumeNameKey, .volumeIsRemovableKey, .volumeIsEjectableKey],
+            options: [.skipHiddenVolumes]
+        ) ?? []
+
+        var ejected = false
+        for url in volumeURLs {
+            do {
+                let resourceValues = try url.resourceValues(forKeys: [.volumeNameKey, .volumeIsRemovableKey, .volumeIsEjectableKey])
+                let isRemovable = resourceValues.volumeIsRemovable ?? false
+                let isEjectable = resourceValues.volumeIsEjectable ?? false
+
+                // Check if this volume is removable/ejectable and might match the device
+                if isRemovable && isEjectable {
+                    let volumeName = resourceValues.volumeName ?? url.lastPathComponent
+                    // Try to match by name (fuzzy match)
+                    if volumeName.lowercased().contains(device.name.lowercased()) ||
+                       device.name.lowercased().contains(volumeName.lowercased()) ||
+                       volumeName.lowercased() == "macintosh hd" && device.name.lowercased().contains("disk") {
+                        continue // Skip internal drive
+                    }
+
+                    // Attempt to eject using diskutil
+                    let process = Process()
+                    process.executableURL = URL(fileURLWithPath: "/usr/sbin/diskutil")
+                    process.arguments = ["eject", url.path]
+                    process.standardOutput = FileHandle.nullDevice
+                    process.standardError = FileHandle.nullDevice
+
+                    do {
+                        try process.run()
+                        process.waitUntilExit()
+                        if process.terminationStatus == 0 {
+                            ejected = true
+                            print("Successfully ejected volume: \(volumeName)")
+                        }
+                    } catch {
+                        print("Failed to eject volume \(volumeName): \(error)")
+                    }
+                }
+            } catch {
+                continue
+            }
+        }
+
+        // If we couldn't eject programmatically, show alert
+        if !ejected {
+            DispatchQueue.main.async {
+                let alert = NSAlert()
+                alert.messageText = "Manual Eject Required"
+                alert.informativeText = "The device \"\(device.name)\" cannot be ejected programmatically. Please eject it manually via Finder by dragging it to the Trash or using the eject button."
+                alert.alertStyle = .informational
+                alert.addButton(withTitle: "OK")
+                alert.runModal()
+            }
+        }
     }
 
     // MARK: - Private Methods
