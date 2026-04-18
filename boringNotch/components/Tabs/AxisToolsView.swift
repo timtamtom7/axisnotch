@@ -384,6 +384,7 @@ struct SystemInfoCard: View {
             Spacer()
 
             VStack(alignment: .leading, spacing: 2) {
+                SystemInfoRow(icon: "cpu", label: "CPU", value: systemInfo.cpuUsage)
                 SystemInfoRow(icon: "wifi", label: "WiFi", value: systemInfo.wifiSSID)
                 SystemInfoRow(icon: "memorychip", label: "RAM", value: systemInfo.ramUsed)
             }
@@ -428,6 +429,16 @@ struct SystemInfoRow: View {
 
 struct WeatherCard: View {
     @StateObject private var weather = WeatherManager.shared
+    @Default(.weatherUnits) private var weatherUnits
+
+    private var unitSymbol: String {
+        weatherUnits == "imperial" ? "°F" : "°C"
+    }
+
+    private func toggleUnits() {
+        weatherUnits = weatherUnits == "imperial" ? "metric" : "imperial"
+        weather.fetchWeather()
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -438,6 +449,17 @@ struct WeatherCard: View {
                 Text("Weather")
                     .font(.system(size: 10, weight: .semibold))
                     .foregroundColor(.gray)
+                Spacer()
+                Button(action: toggleUnits) {
+                    Text(unitSymbol)
+                        .font(.system(size: 9, weight: .medium))
+                        .foregroundColor(.gray)
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 2)
+                        .background(Color.white.opacity(0.1))
+                        .cornerRadius(4)
+                }
+                .buttonStyle(.plain)
             }
 
             Spacer()
@@ -445,6 +467,9 @@ struct WeatherCard: View {
             Text(weather.temperature)
                 .font(.system(size: 24, weight: .medium))
                 .foregroundColor(.white)
+            Text(weather.location)
+                .font(.system(size: 9))
+                .foregroundColor(.gray)
             Text(weather.condition)
                 .font(.system(size: 9))
                 .foregroundColor(.gray)
