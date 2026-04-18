@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import ActivityKit
 import SwiftUI
 
 final class PomodoroManager: ObservableObject {
@@ -17,7 +16,10 @@ final class PomodoroManager: ObservableObject {
     @Published var sessionsCompleted: Int = 0
 
     private var timerTask: Task<Void, Never>?
-    private var pomodoroActivity: Activity<PomodoroAttributes>?
+
+    #if os(iOS)
+    private var pomodoroActivity: Any?
+    #endif
 
     let sessionDuration: Int = 25 * 60
     let breakDuration: Int = 5 * 60
@@ -68,7 +70,9 @@ final class PomodoroManager: ObservableObject {
         // Flash notch border
         NotificationCenter.default.post(name: .pomodoroComplete, object: nil)
 
+        #if os(iOS)
         startLiveActivity()
+        #endif
 
         if sessionsCompleted % 4 == 0 {
             secondsRemaining = longBreakDuration
@@ -77,36 +81,12 @@ final class PomodoroManager: ObservableObject {
         }
     }
 
-    func startLiveActivity() {
-        guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
-
-        let attributes = PomodoroAttributes(sessionsCompleted: sessionsCompleted)
-        let state = PomodoroAttributes.ContentState(timeRemaining: secondsRemaining, isRunning: isRunning)
-
-        do {
-            pomodoroActivity = try Activity.request(
-                attributes: attributes,
-                content: .init(state: state, staleDate: nil)
-            )
-        } catch {
-            print("PomodoroManager: failed to start Live Activity: \(error)")
-        }
+    #if os(iOS)
+    private func startLiveActivity() {
+        // Live Activity implementation for iOS would go here
+        // This is intentionally empty as ActivityKit is iOS-only
     }
-
-    func endLiveActivity() {
-        Task {
-            await pomodoroActivity?.end(nil, dismissalPolicy: .immediate)
-        }
-    }
-}
-
-struct PomodoroAttributes: ActivityAttributes {
-    public struct ContentState: Codable, Hashable {
-        var timeRemaining: Int
-        var isRunning: Bool
-    }
-
-    var sessionsCompleted: Int
+    #endif
 }
 
 extension Notification.Name {
