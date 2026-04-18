@@ -229,11 +229,11 @@ struct ClipboardCard: View {
         }
         .padding(6)
         .frame(width: isExpanded ? 150 : 110, height: isExpanded ? 100 : 70)
-        .background(Color.white.opacity(0.08))
-        .cornerRadius(8)
+        .background(.ultraThinMaterial)
+        .cornerRadius(12)
         .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(item.isPinned ? Color.orange.opacity(0.4) : Color.clear, lineWidth: 1)
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(item.isPinned ? Color.orange.opacity(0.4) : Color.white.opacity(0.15), lineWidth: 1)
         )
         .onTapGesture {
             onCopy()

@@ -59,8 +59,12 @@ struct WeatherCard: View {
         }
         .padding(10)
         .frame(width: 140, height: 100)
-        .background(Color.white.opacity(0.08))
-        .cornerRadius(10)
+        .background(.ultraThinMaterial)
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.white.opacity(0.15), lineWidth: 0.5)
+        )
         .onAppear {
             weather.startAutoRefresh()
         }

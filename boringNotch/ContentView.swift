@@ -311,7 +311,7 @@ struct ContentView: View {
                           BoringFaceAnimation()
                        } else if vm.notchState == .open {
                            BoringHeader()
-                               .frame(height: max(24, vm.effectiveClosedNotchHeight))
+                               .frame(height: 36)
                                .opacity(gestureProgress != 0 ? 1.0 - min(abs(gestureProgress) * 0.1, 0.3) : 1.0)
                        } else {
                            Rectangle().fill(.clear).frame(width: vm.closedNotchSize.width - 20, height: vm.effectiveClosedNotchHeight)
@@ -372,6 +372,8 @@ struct ContentView: View {
                         AxisToolsView()
                     }
                 }
+                .frame(height: max(100, vm.notchSize.height - 48))
+                .clipped()
                 .transition(
                     .scale(scale: 0.8, anchor: .top)
                     .combined(with: .opacity)

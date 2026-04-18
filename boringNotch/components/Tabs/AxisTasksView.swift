@@ -70,8 +70,12 @@ struct AxisTasksView: View {
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 7)
-            .background(Color.white.opacity(0.07))
+            .background(.ultraThinMaterial)
             .cornerRadius(8)
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.white.opacity(0.15), lineWidth: 0.5)
+            )
 
             // Voice transcription display
             if showVoiceInput && !VoiceInputManager.shared.transcription.isEmpty {
@@ -344,8 +348,12 @@ struct AxisTaskCard: View {
         }
         .padding(8)
         .frame(width: 130, height: isExpanded ? 160 : 110)
-        .background(Color.white.opacity(0.07))
-        .cornerRadius(10)
+        .background(.ultraThinMaterial)
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.white.opacity(0.15), lineWidth: 0.5)
+        )
         .contentShape(Rectangle())
         .onTapGesture(perform: onTap)
     }
@@ -402,8 +410,12 @@ struct PomodoroToolCard: View {
         }
         .padding(8)
         .frame(width: 130, height: 110)
-        .background(Color.white.opacity(0.07))
-        .cornerRadius(10)
+        .background(.ultraThinMaterial)
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.white.opacity(0.15), lineWidth: 0.5)
+        )
     }
 
     private func formatTime(_ s: Int) -> String {
@@ -435,8 +447,12 @@ struct StopwatchToolCard: View {
         }
         .padding(8)
         .frame(width: 110, height: 110)
-        .background(Color.white.opacity(0.07))
-        .cornerRadius(10)
+        .background(.ultraThinMaterial)
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.white.opacity(0.15), lineWidth: 0.5)
+        )
     }
 
     private func start() {
@@ -501,8 +517,12 @@ struct NoteToolCard: View {
         }
         .padding(8)
         .frame(width: 110, height: 110)
-        .background(Color.white.opacity(0.07))
-        .cornerRadius(10)
+        .background(.ultraThinMaterial)
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.white.opacity(0.15), lineWidth: 0.5)
+        )
         .onTapGesture { showEditor = true }
         .popover(isPresented: $showEditor, arrowEdge: .bottom) {
             NoteEditorPopover(notes: $notes)
