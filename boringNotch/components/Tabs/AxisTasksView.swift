@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Defaults
+import Combine
 
 struct AxisTasksView: View {
     @ObservedObject var coordinator = BoringViewCoordinator.shared
@@ -15,6 +16,9 @@ struct AxisTasksView: View {
     @State private var isProcessing: Bool = false
     @State private var isListening: Bool = false
     @State private var expandedTaskId: UUID? = nil
+    @State private var cancellables = Set<AnyCancellable>()
+    @State private var pendingDetailTask: AxisTask? = nil
+    @State private var detailOverlayVisible: Bool = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -74,6 +78,23 @@ struct AxisTasksView: View {
             }
         }
         .padding()
+        .onAppear {
+            NotificationCenter.default.publisher(for: .voiceInputCompleted)
+                .compactMap { $0.userInfo?["transcription"] as? String }
+                .sink { transcription in
+                    Task {
+                        await parseTasksFromAI(transcription: transcription)
+                    }
+                }
+                .store(in: &cancellables)
+        }
+        .overlay(alignment: .bottomTrailing) {
+            if detailOverlayVisible, let task = pendingDetailTask {
+                detailPromptOverlay(for: task)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
+        .animation(.easeInOut(duration: 0.25), value: detailOverlayVisible)
     }
 
     private func toggleExpand(_ taskId: UUID) {
@@ -85,7 +106,73 @@ struct AxisTasksView: View {
     }
 
     private func showDetailOverlay(_ task: AxisTask) {
-        // Placeholder for detail overlay
+        pendingDetailTask = task
+        detailOverlayVisible = true
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            withAnimation {
+                self.detailOverlayVisible = false
+                self.pendingDetailTask = nil
+            }
+        }
+    }
+
+    private func parseTasksFromAI(transcription: String) async {
+        await MainActor.run { isProcessing = true }
+
+        do {
+            let parsedTasks = try await AIParserService.shared.parse(transcription: transcription)
+            await MainActor.run {
+                let startIndex = tasks.count
+                for parsed in parsedTasks {
+                    let task = AxisTask(
+                        title: parsed.title,
+                        priority: parsed.priority,
+                        isCompleted: false,
+                        timeEstimate: parsed.timeEstimate
+                    )
+                    tasks.append(task)
+                }
+                if let first = parsedTasks.first {
+                    showDetailOverlay(tasks[startIndex])
+                }
+                isProcessing = false
+            }
+        } catch {
+            await MainActor.run {
+                isProcessing = false
+            }
+            print("Failed to parse tasks from AI: \(error)")
+        }
+    }
+
+    @ViewBuilder
+    private func detailPromptOverlay(for task: AxisTask) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Add details to '\(task.title)'?")
+                .font(.caption)
+                .foregroundColor(.white)
+
+            HStack(spacing: 12) {
+                Button("Yes") {
+                    expandedTaskId = task.id
+                    detailOverlayVisible = false
+                }
+                .buttonStyle(.plain)
+                .foregroundColor(.green)
+
+                Button("No") {
+                    detailOverlayVisible = false
+                    pendingDetailTask = nil
+                }
+                .buttonStyle(.plain)
+                .foregroundColor(.gray)
+            }
+        }
+        .padding(12)
+        .background(Color.black.opacity(0.85))
+        .cornerRadius(10)
+        .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
     }
 
     private func parseTasks() {
