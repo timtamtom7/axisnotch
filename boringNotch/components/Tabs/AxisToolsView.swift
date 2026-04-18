@@ -37,7 +37,6 @@ struct AxisToolsView: View {
                 if showNotchControl { NotchControlCard(onHide: { vm.close() }, onShow: { vm.open() }) }
                 if showStorageInfo { StorageCard() }
                 if showAppLauncher { AppLauncherCard() }
-                if showAppCleaner { CleanerCard() }
                 if showWiFiSharing { WiFiSharingCard() }
             }
             .padding(.horizontal, 16)
