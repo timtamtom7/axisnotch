@@ -2,11 +2,11 @@
 //  ClipboardManager.swift
 //  boringNotch
 //
-//  Manages clipboard history with SQLite persistence
+//  Manages clipboard history with UserDefaults persistence
 //
 
 import Foundation
-import SQLite
+import Defaults
 import AppKit
 
 final class ClipboardManager: ObservableObject {
@@ -14,62 +14,36 @@ final class ClipboardManager: ObservableObject {
 
     @Published private(set) var items: [ClipboardItem] = []
 
-    private var db: Connection?
-    private let clipboardItems = Table("clipboard_items")
-    private let id = SQLite.Expression<String>("id")
-    private let content = SQLite.Expression<String>("content")
-    private let timestamp = SQLite.Expression<Int64>("timestamp")
-    private let pinned = SQLite.Expression<Bool>("pinned")
-
     private let maxItems = 50
+    private let storageKey = Defaults.Key<[ClipboardItemStored]>("clipboardItems", default: [])
 
     private init() {
-        setupDatabase()
         loadItems()
         startMonitoring()
     }
 
-    private func setupDatabase() {
-        do {
-            let path = FileManager.default
-                .urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-                .appendingPathComponent("Axis/axis.sqlite3")
-            try FileManager.default.createDirectory(
-                at: path.deletingLastPathComponent(),
-                withIntermediateDirectories: true
+    private func loadItems() {
+        let stored = Defaults[storageKey]
+        items = stored.map { item in
+            ClipboardItem(
+                id: UUID(uuidString: item.id) ?? UUID(),
+                content: item.content,
+                timestamp: Date(timeIntervalSince1970: item.timestamp),
+                isPinned: item.isPinned
             )
-            db = try Connection(path.path)
-            try db?.run(clipboardItems.create(ifNotExists: true) { t in
-                t.column(id, primaryKey: true)
-                t.column(content)
-                t.column(timestamp)
-                t.column(pinned, defaultValue: false)
-            })
-        } catch {
-            print("ClipboardManager: failed to setup database: \(error)")
         }
     }
 
-    private func loadItems() {
-        guard let db = db else { return }
-        do {
-            var loadedItems: [ClipboardItem] = []
-            let query = clipboardItems.order(pinned.desc, timestamp.desc).limit(maxItems)
-            for row in try db.prepare(query) {
-                let item = ClipboardItem(
-                    id: UUID(uuidString: row[id]) ?? UUID(),
-                    content: row[content],
-                    timestamp: Date(timeIntervalSince1970: TimeInterval(row[timestamp])),
-                    isPinned: row[pinned]
-                )
-                loadedItems.append(item)
-            }
-            DispatchQueue.main.async {
-                self.items = loadedItems
-            }
-        } catch {
-            print("ClipboardManager: failed to load items: \(error)")
+    private func saveItems() {
+        let stored = items.map { item in
+            ClipboardItemStored(
+                id: item.id.uuidString,
+                content: item.content,
+                timestamp: item.timestamp.timeIntervalSince1970,
+                isPinned: item.isPinned
+            )
         }
+        Defaults[storageKey] = stored
     }
 
     private func startMonitoring() {
@@ -96,38 +70,22 @@ final class ClipboardManager: ObservableObject {
             isPinned: false
         )
 
-        guard let db = db else { return }
-        do {
-            try db.run(clipboardItems.insert(
-                id <- newItem.id.uuidString,
-                content <- newItem.content,
-                timestamp <- Int64(newItem.timestamp.timeIntervalSince1970),
-                pinned <- false
-            ))
-            pruneIfNeeded()
-            DispatchQueue.main.async {
-                self.items.insert(newItem, at: 0)
-                self.items = Array(self.items.prefix(self.maxItems))
-            }
-        } catch {
-            print("ClipboardManager: failed to add item: \(error)")
-        }
+        items.insert(newItem, at: 0)
+        pruneIfNeeded()
+        saveItems()
     }
 
     private func pruneIfNeeded() {
-        guard let db = db else { return }
-        do {
-            let count = try db.scalar(clipboardItems.count)
-            if count > maxItems {
-                let excess = count - maxItems
-                let oldestNonPinned = clipboardItems
-                    .filter(pinned == false)
-                    .order(timestamp.asc)
-                    .limit(excess)
-                try db.run(oldestNonPinned.delete())
+        if items.count > maxItems {
+            // Remove oldest non-pinned items
+            var toRemove = items.count - maxItems
+            items = items.filter { item in
+                if toRemove > 0 && !item.isPinned {
+                    toRemove -= 1
+                    return false
+                }
+                return true
             }
-        } catch {
-            print("ClipboardManager: failed to prune: \(error)")
         }
     }
 
@@ -137,20 +95,14 @@ final class ClipboardManager: ObservableObject {
     }
 
     func togglePinned(_ item: ClipboardItem) {
-        guard let db = db else { return }
-        do {
-            let target = clipboardItems.filter(id == item.id.uuidString)
-            try db.run(target.update(pinned <- !item.isPinned))
-            if let index = items.firstIndex(where: { $0.id == item.id }) {
-                items[index] = ClipboardItem(
-                    id: item.id,
-                    content: item.content,
-                    timestamp: item.timestamp,
-                    isPinned: !item.isPinned
-                )
-            }
-        } catch {
-            print("ClipboardManager: failed to toggle pinned: \(error)")
+        if let index = items.firstIndex(where: { $0.id == item.id }) {
+            items[index] = ClipboardItem(
+                id: item.id,
+                content: item.content,
+                timestamp: item.timestamp,
+                isPinned: !item.isPinned
+            )
+            saveItems()
         }
     }
 }
@@ -160,4 +112,11 @@ struct ClipboardItem: Identifiable {
     let content: String
     let timestamp: Date
     var isPinned: Bool
+}
+
+struct ClipboardItemStored: Codable, Defaults.Serializable {
+    let id: String
+    let content: String
+    let timestamp: TimeInterval
+    let isPinned: Bool
 }
