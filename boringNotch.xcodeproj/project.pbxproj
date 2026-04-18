@@ -150,6 +150,7 @@
 		C095C22FB4B224025DC1BC24 /* AxisFilesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17E6A01F8D7AB20E96C3003A /* AxisFilesView.swift */; };
 		CDD26606C873B73818D00DF3 /* AxisToolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 424EA4242918559817B1458A /* AxisToolsView.swift */; };
 		F38DE6482D8243E7008B5C6D /* BatteryActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F38DE6472D8243E2008B5C6D /* BatteryActivityManager.swift */; };
+		A1B2C3D4E5F6A1B2C3D4E5F8 /* VoiceInputManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A1B2C3D4E5F9 /* VoiceInputManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -323,6 +324,7 @@
 		B89CBE038959CE238FA7790E /* AxisFilesView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AxisFilesView.swift; sourceTree = "<group>"; };
 		CB71F110A61BED6CE193FDC3 /* ClipboardManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ClipboardManager.swift; sourceTree = "<group>"; };
 		F38DE6472D8243E2008B5C6D /* BatteryActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryActivityManager.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6A1B2C3D4E5F9 /* VoiceInputManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VoiceInputManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -555,6 +557,7 @@
 				59D8C23B2E589FAA00147B33 /* VolumeManager.swift */,
 				A1B2C3D4E5F6A1B2C3D4E5F6 /* PomodoroManager.swift */,
 				CB71F110A61BED6CE193FDC3 /* ClipboardManager.swift */,
+				A1B2C3D4E5F6A1B2C3D4E5F9 /* VoiceInputManager.swift */,
 			);
 			path = managers;
 			sourceTree = "<group>";
@@ -1066,6 +1069,7 @@
 				64B9D757FE714CCECFC2C6C0 /* AxisFilesView.swift in Sources */,
 				CDD26606C873B73818D00DF3 /* AxisToolsView.swift in Sources */,
 				7870A1C7F49125149B36CA7D /* ClipboardManager.swift in Sources */,
+				A1B2C3D4E5F6A1B2C3D4E5F8 /* VoiceInputManager.swift in Sources */,
 				C095C22FB4B224025DC1BC24 /* AxisFilesView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

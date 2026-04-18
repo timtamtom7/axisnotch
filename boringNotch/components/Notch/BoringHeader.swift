@@ -12,6 +12,7 @@ struct BoringHeader: View {
     @EnvironmentObject var vm: BoringViewModel
     @ObservedObject var batteryModel = BatteryStatusViewModel.shared
     @ObservedObject var coordinator = BoringViewCoordinator.shared
+    @ObservedObject private var voiceInputManager = VoiceInputManager.shared
     @StateObject var tvm = ShelfStateViewModel.shared
     var body: some View {
         HStack(spacing: 0) {
@@ -76,6 +77,23 @@ struct BoringHeader: View {
                                     }
                             }
                             .buttonStyle(PlainButtonStyle())
+                        }
+                        Button(action: {
+                            VoiceInputManager.shared.toggle()
+                        }) {
+                            Capsule()
+                                .fill(voiceInputManager.isListening ? Color.red : Color.black)
+                                .frame(width: 30, height: 30)
+                                .overlay {
+                                    Image(systemName: voiceInputManager.isListening ? "mic.fill" : "mic")
+                                        .foregroundColor(.white)
+                                        .padding()
+                                        .imageScale(.medium)
+                                }
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .if(voiceInputManager.isListening) { view in
+                            view.modifier(PulseAnimationModifier())
                         }
                         if Defaults[.showBatteryIndicator] {
                             BoringBatteryView(

@@ -9,6 +9,7 @@ import Foundation
 import Speech
 import AVFoundation
 import Combine
+import AppKit
 
 final class VoiceInputManager: ObservableObject {
     static let shared = VoiceInputManager()
@@ -51,22 +52,12 @@ final class VoiceInputManager: ObservableObject {
         recognitionTask?.cancel()
         recognitionTask = nil
 
-        let audioSession = AVAudioSession.sharedInstance()
-        do {
-            try audioSession.setCategory(.record, mode: .measurement, options: .duckOthers)
-            try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
-        } catch {
-            errorMessage = "Failed to configure audio session: \(error)"
-            return
-        }
-
         recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
         guard let recognitionRequest = recognitionRequest else {
             errorMessage = "Failed to create recognition request"
             return
         }
 
-        recognitionRequest.shouldOnDeviceDetect = true
         recognitionRequest.requiresOnDeviceRecognition = true
 
         let inputNode = audioEngine.inputNode
