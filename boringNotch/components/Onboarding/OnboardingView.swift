@@ -7,12 +7,14 @@
 
 import SwiftUI
 import AVFoundation
+import UserNotifications
 
 enum OnboardingStep {
     case welcome
     case cameraPermission
     case calendarPermission
     case remindersPermission
+    case notificationPermission
     case accessibilityPermission
     case musicPermission
     case finished
@@ -90,6 +92,28 @@ struct OnboardingView: View {
                             Task {
                                 await requestRemindersPermission()
                                 withAnimation(.easeInOut(duration: 0.6)) {
+                                    step = .notificationPermission
+                                }
+                            }
+                        },
+                        onSkip: {
+                            withAnimation(.easeInOut(duration: 0.6)) {
+                                step = .notificationPermission
+                            }
+                        }
+                    )
+                    .transition(.opacity)
+
+                case .notificationPermission:
+                    PermissionRequestView(
+                        icon: Image(systemName: "bell.fill"),
+                        title: "Enable Notifications",
+                        description: "Boring Notch can alert you when upcoming calendar events are about to start. Enable notifications to receive these timely alerts.",
+                        privacyNote: "Notifications are used only for calendar event reminders and are never shared.",
+                        onAllow: {
+                            Task {
+                                await requestNotificationPermission()
+                                withAnimation(.easeInOut(duration: 0.6)) {
                                     step = .accessibilityPermission
                                 }
                             }
@@ -101,7 +125,7 @@ struct OnboardingView: View {
                         }
                     )
                     .transition(.opacity)
-                
+
             case .accessibilityPermission:
                 PermissionRequestView(
                     icon: Image(systemName: "hand.raised.fill"),
@@ -155,7 +179,16 @@ struct OnboardingView: View {
     func requestRemindersPermission() async {
         _ = try? await calendarService.requestAccess(to: .reminder)
     }
-    
+
+    func requestNotificationPermission() async {
+        let center = UNUserNotificationCenter.current()
+        do {
+            _ = try await center.requestAuthorization(options: [.alert, .sound, .badge])
+        } catch {
+            print("Failed to request notification permission: \(error)")
+        }
+    }
+
     func requestAccessibilityPermission() async {
         await XPCHelperClient.shared.ensureAccessibilityAuthorization(promptIfNeeded: true)
     }

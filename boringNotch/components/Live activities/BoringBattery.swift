@@ -39,6 +39,11 @@ struct BatteryView: View {
         }
     }
 
+    /// Determines if we should show low battery warning tint
+    var showLowBatteryWarning: Bool {
+        levelBattery <= 20 && !isCharging && !isPluggedIn
+    }
+
     var body: some View {
         ZStack(alignment: .leading) {
 
@@ -61,18 +66,42 @@ struct BatteryView: View {
 
             if iconStatus != "" && (isForNotification || Defaults[.showPowerStatusIcons]) {
                 ZStack {
-                    Image(iconStatus)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .foregroundColor(.white)
-                        .frame(
-                            width: 17,
-                            height: 17
-                        )
+                    if isCharging && Defaults[.showBatteryDetails] {
+                        AnimatedChargingBolt()
+                            .frame(width: 17, height: 17)
+                    } else {
+                        Image(iconStatus)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .foregroundColor(.white)
+                            .frame(width: 17, height: 17)
+                    }
                 }
                 .frame(width: batteryWidth, height: batteryWidth)
             }
         }
+        .overlay {
+            if showLowBatteryWarning {
+                RoundedRectangle(cornerRadius: 2)
+                    .stroke(Color.red.opacity(0.6), lineWidth: 1)
+            }
+        }
+    }
+}
+
+/// Animated lightning bolt for charging state
+struct AnimatedChargingBolt: View {
+    @State private var animationPhase: Bool = false
+
+    var body: some View {
+        Image(systemName: "bolt.fill")
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .foregroundColor(animationPhase ? .white : .yellow)
+            .animation(.easeInOut(duration: 0.5).repeatForever(autoreverses: true), value: animationPhase)
+            .onAppear {
+                animationPhase = true
+            }
     }
 }
 
@@ -168,7 +197,7 @@ struct BatteryMenuView: View {
 
 /// A view that displays the battery status and allows interaction to show detailed information.
 struct BoringBatteryView: View {
-    
+
     @State var batteryWidth: CGFloat = 26
     var isCharging: Bool = false
     var isInLowPowerMode: Bool = false
@@ -177,12 +206,13 @@ struct BoringBatteryView: View {
     var maxCapacity: Float = 0
     var timeToFullCharge: Int = 0
     @State var isForNotification: Bool = false
-    
+
     @State private var showPopupMenu: Bool = false
     @State private var isPressed: Bool = false
     @State private var isHoveringButton: Bool = false
     @State private var isHoveringPopover: Bool = false
     @State private var hideTask: Task<Void, Never>? = nil
+    @State private var displayedBatteryLevel: Float = 0
 
     @EnvironmentObject var vm: BoringViewModel
 
@@ -192,12 +222,14 @@ struct BoringBatteryView: View {
                 showPopupMenu.toggle()
             }
         }) {
-            HStack {
+            HStack(spacing: 4) {
                 if Defaults[.showBatteryPercentage] {
-                    Text("\(Int32(levelBattery))%")
-                        .font(.callout)
-                        .foregroundStyle(.white)
-                        .lineLimit(1)
+                    AnimatedBatteryPercentage(
+                        levelBattery: levelBattery,
+                        isCharging: isCharging,
+                        isInLowPowerMode: isInLowPowerMode,
+                        isPluggedIn: isPluggedIn
+                    )
                 }
                 BatteryView(
                     levelBattery: levelBattery,
@@ -207,6 +239,14 @@ struct BoringBatteryView: View {
                     batteryWidth: batteryWidth,
                     isForNotification: isForNotification
                 )
+
+                // Show time-to-full estimate when charging and showBatteryDetails is enabled
+                if isCharging && Defaults[.showBatteryDetails] && timeToFullCharge > 0 {
+                    Text(timeToFullChargeText)
+                        .font(.system(size: 9))
+                        .foregroundStyle(.gray)
+                        .lineLimit(1)
+                }
             }
         }
         .buttonStyle(ScaleButtonStyle())
@@ -220,7 +260,7 @@ struct BoringBatteryView: View {
                 maxCapacity: maxCapacity,
                 timeToFullCharge: timeToFullCharge,
                 isInLowPowerMode: isInLowPowerMode,
-                onDismiss: { 
+                onDismiss: {
                     showPopupMenu = false
                 }
             )
@@ -243,6 +283,18 @@ struct BoringBatteryView: View {
         }
     }
 
+    private var timeToFullChargeText: String {
+        if timeToFullCharge >= 60 {
+            let hours = timeToFullCharge / 60
+            let mins = timeToFullCharge % 60
+            if mins == 0 {
+                return "\(hours)h"
+            }
+            return "\(hours)h\(mins)m"
+        }
+        return "\(timeToFullCharge)m"
+    }
+
     private func scheduleHideIfNeeded() {
         if isHoveringButton || isHoveringPopover { return }
         hideTask?.cancel()
@@ -251,6 +303,48 @@ struct BoringBatteryView: View {
             guard !Task.isCancelled else { return }
             await MainActor.run { withAnimation { showPopupMenu = false } }
         }
+    }
+}
+
+/// Animated battery percentage that smoothly transitions between values
+struct AnimatedBatteryPercentage: View {
+    var levelBattery: Float
+    var isCharging: Bool
+    var isInLowPowerMode: Bool
+    var isPluggedIn: Bool
+
+    @State private var displayedValue: Int = 0
+    @State private var targetValue: Int = 0
+
+    var batteryColor: Color {
+        if isInLowPowerMode {
+            return .yellow
+        } else if levelBattery <= 20 && !isCharging && !isPluggedIn {
+            return .red
+        } else if isCharging || isPluggedIn || levelBattery == 100 {
+            return .green
+        } else {
+            return .white
+        }
+    }
+
+    var body: some View {
+        Text("\(displayedValue)%")
+            .font(.callout)
+            .fontWeight(.medium)
+            .foregroundStyle(batteryColor)
+            .lineLimit(1)
+            .contentTransition(.numericText(countsDown: true))
+            .animation(.easeInOut(duration: 0.3), value: displayedValue)
+            .onChange(of: levelBattery) { _, newValue in
+                targetValue = Int(newValue)
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    displayedValue = targetValue
+                }
+            }
+            .onAppear {
+                displayedValue = Int(levelBattery)
+            }
     }
 }
 

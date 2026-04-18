@@ -170,6 +170,10 @@
 		EA7807126FC2C5A04BB1F777 /* CloudAPIProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69DC7B77D474886F51F9BA20 /* CloudAPIProvider.swift */; };
 		F38DE6482D8243E7008B5C6D /* BatteryActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F38DE6472D8243E2008B5C6D /* BatteryActivityManager.swift */; };
 		F3ECFF45F0C9891AD5F1678D /* AIParserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A304CAB21EE8797A24FBC1F /* AIParserService.swift */; };
+		F0C3D4E5F6A1B2C3D4E5F11 /* FocusModeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0C3D4E5F6A1B2C3D4E5F01 /* FocusModeManager.swift */; };
+		F0C3D4E5F6A1B2C3D4E5F12 /* FocusModeIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0C3D4E5F6A1B2C3D4E5F02 /* FocusModeIndicator.swift */; };
+		F0C3D4E5F6A1B2C3D4E5F13 /* CalendarAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0C3D4E5F6A1B2C3D4E5F03 /* CalendarAlertView.swift */; };
+		F0C3D4E5F6A1B2C3D4E5F14 /* PomodoroLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0C3D4E5F6A1B2C3D4E5F04 /* PomodoroLiveActivity.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -364,6 +368,10 @@
 		F38DE6472D8243E2008B5C6D /* BatteryActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryActivityManager.swift; sourceTree = "<group>"; };
 		FAD24996CD915563A65EC7E6 /* WorldClockCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WorldClockCard.swift; sourceTree = "<group>"; };
 		FB77D037A9381FA6B5E47137 /* WiFiManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WiFiManager.swift; sourceTree = "<group>"; };
+		F0C3D4E5F6A1B2C3D4E5F01 /* FocusModeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusModeManager.swift; sourceTree = "<group>"; };
+		F0C3D4E5F6A1B2C3D4E5F02 /* FocusModeIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusModeIndicator.swift; sourceTree = "<group>"; };
+		F0C3D4E5F6A1B2C3D4E5F03 /* CalendarAlertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarAlertView.swift; sourceTree = "<group>"; };
+		F0C3D4E5F6A1B2C3D4E5F04 /* PomodoroLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroLiveActivity.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -572,6 +580,7 @@
 				B186542F2C6F455E000B926A /* Notch */,
 				9A0887332C7AFF7E00C160EA /* Tabs */,
 				B186542E2C6F453B000B926A /* Music */,
+				F0C3D4E5F6A1B2C3D4E5F05 /* Focus */,
 				14D570BF2C5EA5870011E668 /* AnimatedFace.swift */,
 				14288DE72C6E01C800B9F80C /* ProgressIndicator.swift */,
 				14D570C12C5EAFBF0011E668 /* EmptyState.swift */,
@@ -603,6 +612,7 @@
 				5D3D9AF0E327CCB64ABE25C2 /* USBManager.swift */,
 				4589767747946500EFF5D31F /* StorageManager.swift */,
 				FB77D037A9381FA6B5E47137 /* WiFiManager.swift */,
+				F0C3D4E5F6A1B2C3D4E5F01 /* FocusModeManager.swift */,
 			);
 			path = managers;
 			sourceTree = "<group>";
@@ -619,6 +629,7 @@
 			isa = PBXGroup;
 			children = (
 				14C08BB82C8DE4B1000F8AA0 /* BoringCalendar.swift */,
+				F0C3D4E5F6A1B2C3D4E5F03 /* CalendarAlertView.swift */,
 			);
 			path = Calendar;
 			sourceTree = "<group>";
@@ -857,8 +868,17 @@
 				B1D365CF2C6A9A6C0047BDBC /* SystemEventIndicatorModifier.swift */,
 				14E9FEA92C70BF610062E83F /* DownloadView.swift */,
 				B172AABF2C95DA0B001623F1 /* InlineHUD.swift */,
+				F0C3D4E5F6A1B2C3D4E5F04 /* PomodoroLiveActivity.swift */,
 			);
 			path = "Live activities";
+			sourceTree = "<group>";
+		};
+		F0C3D4E5F6A1B2C3D4E5F05 /* Focus */ = {
+			isa = PBXGroup;
+			children = (
+				F0C3D4E5F6A1B2C3D4E5F02 /* FocusModeIndicator.swift */,
+			);
+			path = Focus;
 			sourceTree = "<group>";
 		};
 		B186543A2C6F49A4000B926A /* Shortcuts */ = {
@@ -1165,6 +1185,10 @@
 				4E865BCF0BD45C87B513A2B2 /* WeatherCard.swift in Sources */,
 				D860B72C5FEAA103746B0BF7 /* WiFiSharingCard.swift in Sources */,
 				E53AAA08525DFFEF2E08A6ED /* WorldClockCard.swift in Sources */,
+				F0C3D4E5F6A1B2C3D4E5F11 /* FocusModeManager.swift in Sources */,
+				F0C3D4E5F6A1B2C3D4E5F12 /* FocusModeIndicator.swift in Sources */,
+				F0C3D4E5F6A1B2C3D4E5F13 /* CalendarAlertView.swift in Sources */,
+				F0C3D4E5F6A1B2C3D4E5F14 /* PomodoroLiveActivity.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -428,7 +428,11 @@ struct NotchHomeView: View {
     var body: some View {
         Group {
             if !coordinator.firstLaunch {
-                mainContent
+                VStack(spacing: 8) {
+                    CalendarAlertView()
+
+                    mainContent
+                }
             }
         }
         // simplified: use a straightforward opacity transition

@@ -304,6 +304,9 @@ struct ContentView: View {
                       } else if (!coordinator.expandingView.show || coordinator.expandingView.type == .music) && vm.notchState == .closed && (musicManager.isPlaying || !musicManager.isPlayerIdle) && coordinator.musicLiveActivityEnabled && !vm.hideOnClosed {
                           MusicLiveActivity()
                               .frame(alignment: .center)
+                      } else if !coordinator.expandingView.show && vm.notchState == .closed && PomodoroManager.shared.showLiveActivityCompact && Defaults[.showLiveActivity] && !vm.hideOnClosed {
+                          PomodoroLiveActivity()
+                              .frame(alignment: .center)
                       } else if !coordinator.expandingView.show && vm.notchState == .closed && (!musicManager.isPlaying && musicManager.isPlayerIdle) && Defaults[.showNotHumanFace] && !vm.hideOnClosed  {
                           BoringFaceAnimation()
                        } else if vm.notchState == .open {

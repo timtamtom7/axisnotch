@@ -235,4 +235,16 @@ extension Defaults.Keys {
 
     // MARK: AI Provider
     static let aiProvider = Key<String>("aiProvider", default: "appleIntelligence")
+
+    // MARK: Focus Mode
+    static let showFocusMode = Key<Bool>("showFocusMode", default: true)
+
+    // MARK: Calendar Alerts
+    static let showCalendarAlerts = Key<Bool>("showCalendarAlerts", default: true)
+
+    // MARK: Live Activity
+    static let showLiveActivity = Key<Bool>("showLiveActivity", default: true)
+
+    // MARK: Battery Details
+    static let showBatteryDetails = Key<Bool>("showBatteryDetails", default: true)
 }
