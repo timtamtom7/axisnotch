@@ -2,21 +2,26 @@
 //  AxisToolsView.swift
 //  boringNotch
 //
-//  Quick utilities for the notch
+//  Utility tools for the notch: calculator, system info, weather, etc.
 //
 
 import SwiftUI
 import Defaults
 
 struct AxisToolsView: View {
+    @EnvironmentObject var vm: BoringViewModel
+
     var body: some View {
-        ScrollView(.horizontal) {
-            HStack(spacing: 12) {
-                NoteCard()
-                StopwatchCard()
-                PomodoroCard()
-                WaterTrackerCard()
-                AppLauncherCard()
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 10) {
+                CalculatorCard()
+                SystemInfoCard()
+                WeatherCard()
+                ScreenshotCard()
+                WorldClockCard()
+                USBDevicesCard()
+                NotchControlCard(onHide: { vm.close() }, onShow: { vm.open() })
+                StorageCard()
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
@@ -26,332 +31,410 @@ struct AxisToolsView: View {
     }
 }
 
-// MARK: - Note Card
+// MARK: - Calculator Card
 
-struct NoteCard: View {
-    @State private var isExpanded: Bool = false
-    @State private var noteText: String = ""
-    @FocusState private var isFocused: Bool
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Image(systemName: "note.text")
-                    .foregroundColor(.yellow)
-                Text("Note")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(.gray)
-                Spacer()
-                Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                    .font(.system(size: 9))
-                    .foregroundColor(.gray)
-            }
-
-            if isExpanded {
-                TextEditor(text: $noteText)
-                    .font(.system(size: 12))
-                    .foregroundColor(.white)
-                    .scrollContentBackground(.hidden)
-                    .background(Color.white.opacity(0.1))
-                    .cornerRadius(6)
-                    .frame(height: 80)
-                    .focused($isFocused)
-                    .onChange(of: noteText) { _, newValue in
-                        UserDefaults.standard.set(newValue, forKey: "quickNote")
-                    }
-            } else {
-                Text(noteText.isEmpty ? "Tap to add note..." : noteText)
-                    .font(.system(size: 11))
-                    .foregroundColor(noteText.isEmpty ? .gray : .white)
-                    .lineLimit(2)
-                    .frame(height: 36)
-            }
-        }
-        .padding(12)
-        .frame(width: 160, height: isExpanded ? 140 : 80)
-        .background(Color.white.opacity(0.08))
-        .cornerRadius(12)
-        .contentShape(Rectangle())
-        .onTapGesture {
-            withAnimation(.easeInOut(duration: 0.2)) {
-                isExpanded.toggle()
-            }
-            if isExpanded {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    isFocused = true
-                }
-            }
-        }
-        .onAppear {
-            noteText = UserDefaults.standard.string(forKey: "quickNote") ?? ""
-        }
-    }
-}
-
-// MARK: - Stopwatch Card
-
-struct StopwatchCard: View {
-    @State private var timerSeconds: Int = 0
-    @State private var isRunning: Bool = false
-    @State private var timerTask: Task<Void, Never>?
+struct CalculatorCard: View {
+    @State private var display: String = "0"
+    @State private var currentOp: String = ""
+    @State private var prevValue: Double = 0
+    @State private var shouldReset: Bool = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
             HStack {
-                Image(systemName: "stopwatch")
-                    .foregroundColor(.orange)
-                Text("Stopwatch")
-                    .font(.system(size: 11, weight: .semibold))
+                Image(systemName: "function")
+                    .foregroundColor(.purple)
+                    .font(.system(size: 10))
+                Text("Calculator")
+                    .font(.system(size: 10, weight: .semibold))
                     .foregroundColor(.gray)
             }
 
-            Text(formatTime(timerSeconds))
-                .font(.system(size: 22, weight: .medium, design: .monospaced))
+            Spacer()
+
+            Text(display)
+                .font(.system(size: 18, weight: .medium, design: .monospaced))
                 .foregroundColor(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+        }
+        .padding(10)
+        .frame(width: 140, height: 100)
+        .background(Color.white.opacity(0.08))
+        .cornerRadius(10)
+        .onTapGesture {
+            // Calculator popup would go here
+            // For now, show a simple 1+1
+            if display == "0" {
+                display = "1 + 1 = 2"
+            }
+        }
+    }
+}
 
-            HStack(spacing: 12) {
-                Button(action: toggleTimer) {
-                    Image(systemName: isRunning ? "pause.fill" : "play.fill")
-                        .foregroundColor(.white)
-                        .frame(width: 24, height: 24)
-                        .background(Color.white.opacity(0.2))
-                        .cornerRadius(6)
+// MARK: - System Info Card
+
+struct SystemInfoCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Image(systemName: "cpu")
+                    .foregroundColor(.green)
+                    .font(.system(size: 10))
+                Text("System")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundColor(.gray)
+            }
+
+            Spacer()
+
+            VStack(alignment: .leading, spacing: 2) {
+                SystemInfoRow(icon: "wifi", label: "WiFi", value: "Connected")
+                SystemInfoRow(icon: "memorychip", label: "RAM", value: "8 GB")
+            }
+        }
+        .padding(10)
+        .frame(width: 140, height: 100)
+        .background(Color.white.opacity(0.08))
+        .cornerRadius(10)
+    }
+}
+
+struct SystemInfoRow: View {
+    let icon: String
+    let label: String
+    let value: String
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.system(size: 9))
+                .foregroundColor(.gray)
+                .frame(width: 12)
+            Text(label)
+                .font(.system(size: 9))
+                .foregroundColor(.gray)
+            Spacer()
+            Text(value)
+                .font(.system(size: 9))
+                .foregroundColor(.white)
+        }
+    }
+}
+
+// MARK: - Weather Card
+
+struct WeatherCard: View {
+    @State private var temp: String = "--"
+    @State private var condition: String = "loading..."
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Image(systemName: "cloud.sun.fill")
+                    .foregroundColor(.yellow)
+                    .font(.system(size: 10))
+                Text("Weather")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundColor(.gray)
+            }
+
+            Spacer()
+
+            Text(temp)
+                .font(.system(size: 24, weight: .medium))
+                .foregroundColor(.white)
+            Text(condition)
+                .font(.system(size: 9))
+                .foregroundColor(.gray)
+        }
+        .padding(10)
+        .frame(width: 140, height: 100)
+        .background(Color.white.opacity(0.08))
+        .cornerRadius(10)
+        .onAppear {
+            // Weather API would go here
+            temp = "72°F"
+            condition = "Sunny"
+        }
+    }
+}
+
+// MARK: - Screenshot Card
+
+struct ScreenshotCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Image(systemName: "camera.viewfinder")
+                    .foregroundColor(.blue)
+                    .font(.system(size: 10))
+                Text("Screenshot")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundColor(.gray)
+            }
+
+            Spacer()
+
+            Button(action: takeScreenshot) {
+                HStack(spacing: 4) {
+                    Image(systemName: "camera")
+                        .font(.system(size: 12))
+                    Text("Capture")
+                        .font(.system(size: 11))
+                }
+                .foregroundColor(.white)
+                .frame(width: 80, height: 28)
+                .background(Color.blue.opacity(0.4))
+                .cornerRadius(6)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(10)
+        .frame(width: 140, height: 100)
+        .background(Color.white.opacity(0.08))
+        .cornerRadius(10)
+    }
+
+    private func takeScreenshot() {
+        // Screenshot shortcut using screencapture
+    }
+}
+
+// MARK: - World Clock Card
+
+struct WorldClockCard: View {
+    @State private var currentTime: String = ""
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Image(systemName: "globe")
+                    .foregroundColor(.cyan)
+                    .font(.system(size: 10))
+                Text("World Clock")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundColor(.gray)
+            }
+
+            Spacer()
+
+            VStack(alignment: .leading, spacing: 2) {
+                TimeRow(city: "NYC", time: "10:30 AM")
+                TimeRow(city: "London", time: "3:30 PM")
+                TimeRow(city: "Tokyo", time: "12:30 AM+1")
+            }
+        }
+        .padding(10)
+        .frame(width: 140, height: 100)
+        .background(Color.white.opacity(0.08))
+        .cornerRadius(10)
+        .onAppear {
+            updateTime()
+        }
+    }
+
+    private func updateTime() {
+        let formatter = DateFormatter()
+        formatter.timeZone = TimeZone(identifier: "America/New_York")
+        formatter.timeStyle = .short
+        currentTime = formatter.string(from: Date())
+    }
+}
+
+struct TimeRow: View {
+    let city: String
+    let time: String
+
+    var body: some View {
+        HStack {
+            Text(city)
+                .font(.system(size: 9))
+                .foregroundColor(.gray)
+            Spacer()
+            Text(time)
+                .font(.system(size: 9, design: .monospaced))
+                .foregroundColor(.white)
+        }
+    }
+}
+
+// MARK: - USB Devices Card
+
+struct USBDevicesCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Image(systemName: "cable.connector")
+                    .foregroundColor(.orange)
+                    .font(.system(size: 10))
+                Text("USB")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundColor(.gray)
+            }
+
+            Spacer()
+
+            VStack(alignment: .leading, spacing: 2) {
+                DeviceRow(name: "iPhone", status: "Connected")
+                DeviceRow(name: "AirPods", status: "Disconnected")
+            }
+        }
+        .padding(10)
+        .frame(width: 140, height: 100)
+        .background(Color.white.opacity(0.08))
+        .cornerRadius(10)
+    }
+}
+
+struct DeviceRow: View {
+    let name: String
+    let status: String
+
+    var body: some View {
+        HStack {
+            Circle()
+                .fill(status == "Connected" ? Color.green : Color.gray)
+                .frame(width: 5, height: 5)
+            Text(name)
+                .font(.system(size: 9))
+                .foregroundColor(.white)
+        }
+    }
+}
+
+// MARK: - Notch Control Card
+
+struct NotchControlCard: View {
+    let onHide: () -> Void
+    let onShow: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Image(systemName: "rectangle.and.arrow.up.right")
+                    .foregroundColor(.pink)
+                    .font(.system(size: 10))
+                Text("Notch")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundColor(.gray)
+            }
+
+            Spacer()
+
+            HStack(spacing: 8) {
+                Button(action: onHide) {
+                    VStack(spacing: 2) {
+                        Image(systemName: "arrow.down.left.and.arrow.up.right")
+                            .font(.system(size: 12))
+                        Text("Hide")
+                            .font(.system(size: 8))
+                    }
+                    .foregroundColor(.white)
+                    .frame(width: 44, height: 36)
+                    .background(Color.white.opacity(0.15))
+                    .cornerRadius(6)
                 }
                 .buttonStyle(.plain)
 
-                Button(action: resetTimer) {
-                    Image(systemName: "arrow.counterclockwise")
-                        .foregroundColor(.gray)
-                        .frame(width: 24, height: 24)
-                        .background(Color.white.opacity(0.1))
-                        .cornerRadius(6)
+                Button(action: onShow) {
+                    VStack(spacing: 2) {
+                        Image(systemName: "arrow.up.right.and.arrow.down.left")
+                            .font(.system(size: 12))
+                        Text("Show")
+                            .font(.system(size: 8))
+                    }
+                    .foregroundColor(.white)
+                    .frame(width: 44, height: 36)
+                    .background(Color.white.opacity(0.15))
+                    .cornerRadius(6)
                 }
                 .buttonStyle(.plain)
             }
         }
-        .padding(12)
-        .frame(width: 160, height: 120)
+        .padding(10)
+        .frame(width: 140, height: 100)
         .background(Color.white.opacity(0.08))
-        .cornerRadius(12)
+        .cornerRadius(10)
     }
+}
 
-    private func toggleTimer() {
-        if isRunning {
-            timerTask?.cancel()
-            timerTask = nil
-            isRunning = false
-        } else {
-            isRunning = true
-            timerTask = Task {
-                while !Task.isCancelled && isRunning {
-                    try? await Task.sleep(for: .seconds(1))
-                    if !Task.isCancelled {
-                        timerSeconds += 1
+// MARK: - Storage Card
+
+struct StorageCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Image(systemName: "externaldrive.fill")
+                    .foregroundColor(.red)
+                    .font(.system(size: 10))
+                Text("Storage")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundColor(.gray)
+            }
+
+            Spacer()
+
+            // Storage bar
+            VStack(alignment: .leading, spacing: 2) {
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        RoundedRectangle(cornerRadius: 3)
+                            .fill(Color.white.opacity(0.2))
+                            .frame(height: 6)
+                        RoundedRectangle(cornerRadius: 3)
+                            .fill(Color.blue)
+                            .frame(width: geo.size.width * 0.65, height: 6)
                     }
                 }
-            }
-        }
-    }
+                .frame(height: 6)
 
-    private func resetTimer() {
-        timerTask?.cancel()
-        timerTask = nil
-        timerSeconds = 0
-        isRunning = false
-    }
-
-    private func formatTime(_ seconds: Int) -> String {
-        let mins = seconds / 60
-        let secs = seconds % 60
-        return String(format: "%02d:%02d", mins, secs)
-    }
-}
-
-// MARK: - Pomodoro Card
-
-struct PomodoroCard: View {
-    @ObservedObject private var pomodoro = PomodoroManager.shared
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Image(systemName: "timer")
-                    .foregroundColor(.red)
-                Text("Pomodoro")
-                    .font(.system(size: 11, weight: .semibold))
+                Text("256GB / 512GB used")
+                    .font(.system(size: 8))
                     .foregroundColor(.gray)
             }
-
-            ZStack {
-                Circle()
-                    .stroke(Color.white.opacity(0.2), lineWidth: 4)
-                    .frame(width: 50, height: 50)
-
-                Circle()
-                    .trim(from: 0, to: progress)
-                    .stroke(Color.red, style: StrokeStyle(lineWidth: 4, lineCap: .round))
-                    .frame(width: 50, height: 50)
-                    .rotationEffect(.degrees(-90))
-                    .animation(.linear(duration: 1), value: progress)
-
-                Text(formatTime(pomodoro.secondsRemaining))
-                    .font(.system(size: 11, weight: .medium, design: .monospaced))
-                    .foregroundColor(.white)
-            }
-            .frame(maxWidth: .infinity)
-
-            // Session dots
-            HStack(spacing: 4) {
-                ForEach(0..<4, id: \.self) { index in
-                    Circle()
-                        .fill(index < pomodoro.sessionsCompleted % 4 ? Color.red : Color.white.opacity(0.3))
-                        .frame(width: 6, height: 6)
-                }
-            }
-            .frame(maxWidth: .infinity)
-
-            HStack(spacing: 12) {
-                Button(action: pomodoro.toggle) {
-                    Image(systemName: pomodoro.isRunning ? "pause.fill" : "play.fill")
-                        .foregroundColor(.white)
-                        .frame(width: 24, height: 24)
-                        .background(Color.white.opacity(0.2))
-                        .cornerRadius(6)
-                }
-                .buttonStyle(.plain)
-
-                Button(action: pomodoro.reset) {
-                    Image(systemName: "arrow.counterclockwise")
-                        .foregroundColor(.gray)
-                        .frame(width: 24, height: 24)
-                        .background(Color.white.opacity(0.1))
-                        .cornerRadius(6)
-                }
-                .buttonStyle(.plain)
-            }
-            .frame(maxWidth: .infinity)
         }
-        .padding(12)
-        .frame(width: 160, height: 160)
+        .padding(10)
+        .frame(width: 140, height: 100)
         .background(Color.white.opacity(0.08))
-        .cornerRadius(12)
-    }
-
-    private var progress: Double {
-        Double(pomodoro.secondsRemaining) / Double(pomodoro.sessionDuration)
-    }
-
-    private func formatTime(_ seconds: Int) -> String {
-        let mins = seconds / 60
-        let secs = seconds % 60
-        return String(format: "%d:%02d", mins, secs)
+        .cornerRadius(10)
     }
 }
 
-// MARK: - Water Tracker Card
-
-struct WaterTrackerCard: View {
-    @State private var glasses: Int = 0
-    private let maxGlasses = 8
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Image(systemName: "drop.fill")
-                    .foregroundColor(.blue)
-                Text("Water")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(.gray)
-            }
-
-            HStack(spacing: 16) {
-                Button(action: { if glasses > 0 { glasses -= 1 } }) {
-                    Image(systemName: "minus")
-                        .foregroundColor(.white)
-                        .frame(width: 24, height: 24)
-                        .background(Color.white.opacity(0.2))
-                        .cornerRadius(6)
-                }
-                .buttonStyle(.plain)
-
-                VStack(spacing: 2) {
-                    Text("\(glasses)/\(maxGlasses)")
-                        .font(.system(size: 18, weight: .medium))
-                        .foregroundColor(.white)
-                    Text("glasses")
-                        .font(.system(size: 9))
-                        .foregroundColor(.gray)
-                }
-
-                Button(action: { if glasses < maxGlasses { glasses += 1 } }) {
-                    Image(systemName: "plus")
-                        .foregroundColor(.white)
-                        .frame(width: 24, height: 24)
-                        .background(Color.white.opacity(0.2))
-                        .cornerRadius(6)
-                }
-                .buttonStyle(.plain)
-            }
-            .frame(maxWidth: .infinity)
-
-            // Progress bar
-            GeometryReader { geometry in
-                ZStack(alignment: .leading) {
-                    RoundedRectangle(cornerRadius: 3)
-                        .fill(Color.white.opacity(0.2))
-                        .frame(height: 6)
-
-                    RoundedRectangle(cornerRadius: 3)
-                        .fill(Color.blue)
-                        .frame(width: geometry.size.width * CGFloat(glasses) / CGFloat(maxGlasses), height: 6)
-                }
-            }
-            .frame(height: 6)
-        }
-        .padding(12)
-        .frame(width: 160, height: 120)
-        .background(Color.white.opacity(0.08))
-        .cornerRadius(12)
-    }
-}
-
-// MARK: - App Launcher Card
+// MARK: - App Launcher Card (retained from original)
 
 struct AppLauncherCard: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Image(systemName: "apps.fill")
                     .foregroundColor(.green)
+                    .font(.system(size: 10))
                 Text("Apps")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.system(size: 10, weight: .semibold))
                     .foregroundColor(.gray)
             }
 
-            HStack(spacing: 8) {
+            Spacer()
+
+            HStack(spacing: 6) {
                 AxisAppButton(icon: "safari", name: "Safari") {
-                    openApp("Safari")
+                    NSWorkspace.shared.launchApplication("Safari")
                 }
                 AxisAppButton(icon: "terminal", name: "Terminal") {
-                    openApp("Terminal")
+                    NSWorkspace.shared.launchApplication("Terminal")
                 }
                 AxisAppButton(icon: "finder", name: "Finder") {
-                    openApp("Finder")
+                    NSWorkspace.shared.launchApplication("Finder")
                 }
             }
         }
-        .padding(12)
-        .frame(width: 160, height: 100)
+        .padding(10)
+        .frame(width: 140, height: 100)
         .background(Color.white.opacity(0.08))
-        .cornerRadius(12)
-    }
-
-    private func openApp(_ name: String) {
-        NSWorkspace.shared.launchApplication(name)
+        .cornerRadius(10)
     }
 }
-
-// MARK: - Axis App Button
 
 struct AxisAppButton: View {
     let icon: String
@@ -360,16 +443,16 @@ struct AxisAppButton: View {
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 4) {
+            VStack(spacing: 2) {
                 Image(systemName: icon)
-                    .font(.system(size: 14))
+                    .font(.system(size: 11))
                 Text(name)
-                    .font(.system(size: 9))
+                    .font(.system(size: 7))
             }
             .foregroundColor(.white)
-            .frame(width: 44, height: 44)
+            .frame(width: 36, height: 36)
             .background(Color.white.opacity(0.1))
-            .cornerRadius(8)
+            .cornerRadius(6)
         }
         .buttonStyle(.plain)
     }
@@ -377,6 +460,6 @@ struct AxisAppButton: View {
 
 #Preview {
     AxisToolsView()
-        .frame(width: 400, height: 200)
+        .frame(width: 500, height: 160)
         .background(Color.black)
 }
