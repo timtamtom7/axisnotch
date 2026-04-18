@@ -22,6 +22,7 @@ final class WiFiManager: ObservableObject {
     @Published var hasPermissions: Bool = false
 
     private let context = CIContext()
+    private var passwordClearTimer: AnyCancellable?
 
     private init() {
         refreshWiFiInfo()
@@ -33,6 +34,11 @@ final class WiFiManager: ObservableObject {
         isLoading = true
         errorMessage = nil
 
+        // Clear any existing password timer
+        passwordClearTimer?.cancel()
+        // Clear existing password before fetching new one
+        currentPassword = ""
+
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             let ssid = self?.getCurrentSSID() ?? "Not Connected"
             let password = self?.getWiFiPassword() ?? ""
@@ -43,6 +49,15 @@ final class WiFiManager: ObservableObject {
                 self?.currentPassword = password
                 self?.hasPermissions = hasPerms
                 self?.isLoading = false
+
+                // Set timer to clear password after 30 seconds
+                if !password.isEmpty {
+                    self?.passwordClearTimer = Just(())
+                        .delay(for: .seconds(30), scheduler: DispatchQueue.main)
+                        .sink { [weak self] _ in
+                            self?.currentPassword = ""
+                        }
+                }
 
                 if !ssid.isEmpty && ssid != "Not Connected" && !password.isEmpty {
                     self?.generateQRCode(ssid: ssid, password: password)

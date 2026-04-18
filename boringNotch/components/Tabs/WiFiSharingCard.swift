@@ -93,6 +93,7 @@ struct WiFiSharingCard: View {
 struct QRDetailSheet: View {
     @Binding var isPresented: Bool
     @ObservedObject private var manager = WiFiManager.shared
+    @State private var isPasswordVisible = false
 
     var body: some View {
         VStack(spacing: 20) {
@@ -114,8 +115,23 @@ struct QRDetailSheet: View {
                     HStack {
                         Text("Password: ")
                             .foregroundColor(.secondary)
-                        Text(manager.currentPassword)
-                            .font(.system(.body, design: .monospaced))
+                        if isPasswordVisible {
+                            Text(manager.currentPassword)
+                                .font(.system(.body, design: .monospaced))
+                        } else {
+                            Text(String(repeating: "•", count: manager.currentPassword.count))
+                                .font(.system(.body, design: .monospaced))
+                        }
+                        Button(isPasswordVisible ? "Hide" : "Show") {
+                            isPasswordVisible.toggle()
+                            if isPasswordVisible {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                                    isPasswordVisible = false
+                                }
+                            }
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
                     }
                 }
             }
