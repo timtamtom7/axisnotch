@@ -43,13 +43,8 @@ final class NotificationManager: NSObject, ObservableObject {
     }
 
     private func isDNDEnabled() -> Bool {
-        // Check DND status via multiple methods for best-effort detection
-        // Method 1: Check notification center DND preference
+        // Check DND status via notification center preference
         if checkNotificationCenterDND() {
-            return true
-        }
-        // Method 2: Check Focus mode (macOS 12+)
-        if checkFocusMode() {
             return true
         }
         return false
@@ -83,28 +78,6 @@ final class NotificationManager: NSObject, ObservableObject {
             }
         } catch {
             // If we can't check DND via defaults, silently continue
-        }
-        return false
-    }
-
-    private func checkFocusMode() -> Bool {
-        // Check if Focus mode is active (macOS 12+: System Settings > Focus)
-        // Focus state is stored in a plist, check via the Focus preferences
-        let task = Process()
-        task.executableURL = URL(fileURLWithPath: "/usr/bin/defaults")
-        task.arguments = ["read", "com.apple.controlcenter", "NSStatusItem Visible Focus"]
-
-        let pipe = Pipe()
-        task.standardOutput = pipe
-        task.standardError = pipe
-
-        do {
-            try task.run()
-            task.waitUntilExit()
-            // If Focus indicator is showing, DND might be active
-            // This is a best-effort check
-        } catch {
-            // Silently continue on error
         }
         return false
     }

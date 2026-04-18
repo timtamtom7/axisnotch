@@ -20,6 +20,7 @@ final class ScreenshotManager: ObservableObject {
     private var monitorStream: DispatchSourceFileSystemObject?
     private var desktopPath: URL
     private let maxScreenshots = 5
+    private var debounceTimer: Timer?
 
     struct ScreenshotItem: Identifiable, Codable {
         let id: UUID
@@ -29,16 +30,15 @@ final class ScreenshotManager: ObservableObject {
 
         var url: URL { URL(fileURLWithPath: path) }
         var thumbnail: NSImage? {
-            guard let image = NSImage(contentsOf: url) else { return nil }
+            guard let image = NSImage(contentsOf: url),
+                  let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return nil }
             let thumbnailSize = NSSize(width: 80, height: 60)
-            let thumbnail = NSImage(size: thumbnailSize)
-            thumbnail.lockFocus()
-            image.draw(in: NSRect(origin: .zero, size: thumbnailSize),
-                      from: NSRect(origin: .zero, size: image.size),
-                      operation: .copy,
-                      fraction: 1.0)
-            thumbnail.unlockFocus()
-            return thumbnail
+            let colorSpace = CGColorSpaceCreateDeviceRGB()
+            guard let context = CGContext(data: nil, width: 80, height: 60, bitsPerComponent: 8, bytesPerRow: 0, space: colorSpace, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return nil }
+            context.interpolationQuality = .high
+            context.draw(cgImage, in: CGRect(x: 0, y: 0, width: 80, height: 60))
+            guard let resizedCGImage = context.makeImage() else { return nil }
+            return NSImage(cgImage: resizedCGImage, size: thumbnailSize)
         }
     }
 
@@ -80,7 +80,12 @@ final class ScreenshotManager: ObservableObject {
         )
 
         source.setEventHandler { [weak self] in
-            self?.checkForNewScreenshots()
+            DispatchQueue.main.async {
+                self?.debounceTimer?.invalidate()
+                self?.debounceTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { [weak self] _ in
+                    self?.checkForNewScreenshots()
+                }
+            }
         }
 
         source.setCancelHandler {

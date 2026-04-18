@@ -72,8 +72,13 @@ final class AdminAuthorization: ObservableObject {
         isAuthorized = false
     }
 
+    private func sanitizeCommand(_ input: String) -> String {
+        return input.replacingOccurrences(of: "\"", with: "\\\"")
+                   .replacingOccurrences(of: "\\", with: "\\\\")
+    }
+
     func executeWithAdminPrivileges(command: String) async -> (success: Bool, output: String) {
-        let fullCommand = "do shell script \"\(command)\" with administrator privileges"
+        let fullCommand = "do shell script \"\(sanitizeCommand(command))\" with administrator privileges"
 
         var error: NSDictionary?
         if let appleScript = NSAppleScript(source: fullCommand) {
