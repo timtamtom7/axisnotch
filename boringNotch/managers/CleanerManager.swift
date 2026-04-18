@@ -9,6 +9,84 @@ import Foundation
 import Combine
 import AppKit
 import SwiftUI
+import Security
+
+// MARK: - Admin Authorization
+
+final class AdminAuthorization: ObservableObject {
+    static let shared = AdminAuthorization()
+
+    @Published var isAuthorized: Bool = false
+    private var authRef: AuthorizationRef?
+
+    private init() {}
+
+    func requestAdminAuthorization(reason: String) async -> Bool {
+        var authItem = AuthorizationItem(name: kAuthorizationRightExecute, valueLength: 0, value: nil, flags: 0)
+        var authRights = AuthorizationRights(count: 1, items: &authItem)
+        let authFlags: AuthorizationFlags = [.interactionAllowed, .preAuthorize, .extendRights]
+
+        var status = AuthorizationCreate(nil, nil, [], &authRef)
+
+        if status == errAuthorizationSuccess {
+            status = AuthorizationCopyRights(authRef, &authRights, nil, authFlags, nil)
+        }
+
+        await MainActor.run {
+            self.isAuthorized = (status == errAuthorizationSuccess)
+        }
+
+        if status == errAuthorizationSuccess {
+            return true
+        } else if status == errAuthorizationCanceled {
+            // User canceled the authorization dialog
+            return false
+        }
+
+        // Try alternative method using AppleScript for privilege escalation
+        return await requestAdminViaAppleScript(reason: reason)
+    }
+
+    private func requestAdminViaAppleScript(reason: String) async -> Bool {
+        let script = """
+        do shell script "echo test" with administrator privileges
+        """
+
+        var error: NSDictionary?
+        if let appleScript = NSAppleScript(source: script) {
+            appleScript.executeAndReturnError(&error)
+            let success = error == nil
+            await MainActor.run {
+                self.isAuthorized = success
+            }
+            return success
+        }
+        return false
+    }
+
+    func releaseAuthorization() {
+        if let authRef = authRef {
+            AuthorizationFree(authRef, [])
+            self.authRef = nil
+        }
+        isAuthorized = false
+    }
+
+    func executeWithAdminPrivileges(command: String) async -> (success: Bool, output: String) {
+        let fullCommand = "do shell script \"\(command)\" with administrator privileges"
+
+        var error: NSDictionary?
+        if let appleScript = NSAppleScript(source: fullCommand) {
+            let result = appleScript.executeAndReturnError(&error)
+            if error == nil, let output = result.stringValue {
+                return (true, output)
+            }
+        }
+        return (false, error?.description ?? "Unknown error")
+    }
+}
+
+// MARK: - CleanerManager
 
 final class CleanerManager: ObservableObject {
     static let shared = CleanerManager()
@@ -20,6 +98,8 @@ final class CleanerManager: ObservableObject {
     @Published var isScanning: Bool = false
     @Published var isCleaning: Bool = false
     @Published var lastCleanDate: Date?
+    @Published var requiresAdmin: Bool = false
+    @Published var showAuthAlert: Bool = false
 
     struct CleanerItem: Identifiable {
         let id = UUID()
@@ -28,7 +108,10 @@ final class CleanerManager: ObservableObject {
         let color: String
         var size: Int64
         let paths: [String]
+        let requiresAdmin: Bool
     }
+
+    private let adminAuth = AdminAuthorization.shared
 
     private init() {
         scanCacheSizes()
@@ -111,18 +194,18 @@ final class CleanerManager: ObservableObject {
                 .appendingPathComponent("Library/Caches/com.google.Chrome"),
             FileManager.default.homeDirectoryForCurrentUser
                 .appendingPathComponent("Library/Caches/Mozilla")
-        ])
+        ], requiresAdmin: false)
     }
 
     func cleanAppCache() {
         let cachesDir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
-        cleanCache(at: [cachesDir])
+        cleanCache(at: [cachesDir], requiresAdmin: false)
     }
 
     func cleanLogs() {
         let logsDir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
             .appendingPathComponent("Logs")
-        cleanCache(at: [logsDir])
+        cleanCache(at: [logsDir], requiresAdmin: false)
     }
 
     func cleanAll() {
@@ -132,13 +215,13 @@ final class CleanerManager: ObservableObject {
             guard let self = self else { return }
 
             // Clean browser cache
-            self.cleanBrowserCache()
+            self.cleanBrowserCacheInternal()
 
             // Clean app cache
-            self.cleanAppCache()
+            self.cleanAppCacheInternal()
 
             // Clean logs
-            self.cleanLogs()
+            self.cleanLogsInternal()
 
             DispatchQueue.main.async {
                 self.lastCleanDate = Date()
@@ -148,11 +231,69 @@ final class CleanerManager: ObservableObject {
         }
     }
 
-    private func cleanCache(at urls: [URL]) {
+    func cleanAllWithAdminIfNeeded() {
+        // Some operations may require admin - show auth alert if needed
+        showAuthAlert = true
+    }
+
+    private func cleanCache(at urls: [URL], requiresAdmin: Bool) {
+        if requiresAdmin && !adminAuth.isAuthorized {
+            // Request authorization first
+            Task {
+                let authorized = await adminAuth.requestAdminAuthorization(reason: "Delete system cache")
+                if authorized {
+                    await performCleanCache(at: urls)
+                }
+            }
+        } else {
+            performCleanCacheSync(at: urls)
+        }
+    }
+
+    private func performCleanCache(at urls: [URL]) async {
+        for url in urls {
+            await performCleanCacheItem(at: url)
+        }
+    }
+
+    private func performCleanCacheItem(at url: URL) async {
+        // Use admin privileges if available
+        if adminAuth.isAuthorized {
+            let command = "rm -rf '\(url.path)' && mkdir -p '\(url.path)'"
+            _ = await adminAuth.executeWithAdminPrivileges(command: command)
+        } else {
+            performCleanCacheSync(at: [url])
+        }
+    }
+
+    private func performCleanCacheSync(at urls: [URL]) {
         for url in urls {
             try? FileManager.default.removeItem(at: url)
             try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
         }
+    }
+
+    private func cleanBrowserCacheInternal() {
+        let urls = [
+            FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+                .appendingPathComponent("com.apple.Safari"),
+            FileManager.default.homeDirectoryForCurrentUser
+                .appendingPathComponent("Library/Caches/com.google.Chrome"),
+            FileManager.default.homeDirectoryForCurrentUser
+                .appendingPathComponent("Library/Caches/Mozilla")
+        ]
+        performCleanCacheSync(at: urls)
+    }
+
+    private func cleanAppCacheInternal() {
+        let cachesDir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+        performCleanCacheSync(at: [cachesDir])
+    }
+
+    private func cleanLogsInternal() {
+        let logsDir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+            .appendingPathComponent("Logs")
+        performCleanCacheSync(at: [logsDir])
     }
 
     func formatSize(_ bytes: Int64) -> String {
@@ -167,8 +308,11 @@ final class CleanerManager: ObservableObject {
 
 struct CleanerCard: View {
     @ObservedObject private var cleanerManager = CleanerManager.shared
+    @ObservedObject private var adminAuth = AdminAuthorization.shared
     @State private var showConfirmation: Bool = false
     @State private var showCleanResult: Bool = false
+    @State private var showAuthError: Bool = false
+    @State private var authErrorMessage: String = ""
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -179,6 +323,14 @@ struct CleanerCard: View {
                 Text("Cleaner")
                     .font(.system(size: 9, weight: .semibold))
                     .foregroundColor(.gray)
+
+                Spacer()
+
+                if adminAuth.isAuthorized {
+                    Image(systemName: "lock.open.fill")
+                        .font(.system(size: 7))
+                        .foregroundColor(.green)
+                }
             }
 
             Spacer()
@@ -225,8 +377,7 @@ struct CleanerCard: View {
         .alert("Clean Cache", isPresented: $showConfirmation) {
             Button("Cancel", role: .cancel) {}
             Button("Clean All", role: .destructive) {
-                cleanerManager.cleanAll()
-                showCleanResult = true
+                performCleanWithAuth()
             }
         } message: {
             Text("This will remove browser caches, app caches, and logs. Some data may be recreated on next launch.")
@@ -235,6 +386,33 @@ struct CleanerCard: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text("Cache cleanup completed successfully.")
+        }
+        .alert("Authorization Required", isPresented: $showAuthError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(authErrorMessage)
+        }
+    }
+
+    private func performCleanWithAuth() {
+        // Request admin authorization if needed for certain operations
+        Task {
+            if cleanerManager.requiresAdmin && !adminAuth.isAuthorized {
+                let authorized = await adminAuth.requestAdminAuthorization(
+                    reason: "Admin access required to clean certain system caches"
+                )
+                if !authorized {
+                    await MainActor.run {
+                        authErrorMessage = "Administrator authorization is required to clean system caches. Please grant admin privileges and try again."
+                        showAuthError = true
+                    }
+                    return
+                }
+            }
+            await MainActor.run {
+                cleanerManager.cleanAll()
+                showCleanResult = true
+            }
         }
     }
 }

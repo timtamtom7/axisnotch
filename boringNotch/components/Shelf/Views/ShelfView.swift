@@ -182,15 +182,31 @@ struct ClipboardCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(item.content)
-                .font(.system(size: 10))
-                .foregroundColor(.white)
-                .lineLimit(isExpanded ? 6 : 3)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            // Rich preview based on item kind
+            Group {
+                switch item.kind {
+                case .image:
+                    imagePreview
+                case .url:
+                    urlPreview
+                case .file:
+                    filePreview
+                case .code:
+                    codePreview
+                case .text:
+                    textPreview
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             Spacer()
 
             HStack {
+                // Kind indicator
+                Image(systemName: kindIcon)
+                    .font(.system(size: 7))
+                    .foregroundColor(kindColor)
+
                 Text(formatTime(item.timestamp))
                     .font(.system(size: 8))
                     .foregroundColor(.gray)
@@ -238,6 +254,121 @@ struct ClipboardCard: View {
             Button(role: .destructive, action: {}) {
                 Label("Delete", systemImage: "trash")
             }
+        }
+    }
+
+    // MARK: - Preview Views
+
+    @ViewBuilder
+    private var imagePreview: some View {
+        if let imageData = item.imageData,
+           let nsImage = NSImage(data: imageData) {
+            Image(nsImage: nsImage)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(maxHeight: isExpanded ? 60 : 40)
+                .cornerRadius(4)
+        } else {
+            Image(systemName: "photo")
+                .font(.system(size: 20))
+                .foregroundColor(.gray)
+        }
+    }
+
+    @ViewBuilder
+    private var urlPreview: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            // Favicon placeholder
+            Image(systemName: "globe")
+                .font(.system(size: 12))
+                .foregroundColor(.blue)
+
+            Text(item.content)
+                .font(.system(size: 9))
+                .foregroundColor(.white)
+                .lineLimit(isExpanded ? 3 : 2)
+                .truncationMode(.middle)
+        }
+    }
+
+    @ViewBuilder
+    private var filePreview: some View {
+        HStack(spacing: 4) {
+            fileIcon
+                .frame(width: 20, height: 20)
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text(fileName)
+                    .font(.system(size: 9, weight: .medium))
+                    .foregroundColor(.white)
+                    .lineLimit(1)
+
+                if isExpanded {
+                    Text(filePath)
+                        .font(.system(size: 7))
+                        .foregroundColor(.gray)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var codePreview: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            Text(item.content)
+                .font(.system(size: 8, design: .monospaced))
+                .foregroundColor(Color.green.opacity(0.9))
+                .lineLimit(isExpanded ? 6 : 3)
+        }
+    }
+
+    @ViewBuilder
+    private var textPreview: some View {
+        Text(item.content)
+            .font(.system(size: 10))
+            .foregroundColor(.white)
+            .lineLimit(isExpanded ? 6 : 3)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    // MARK: - Helpers
+
+    private var fileIcon: NSImage {
+        let path = (item.content as NSString).expandingTildeInPath
+        return NSWorkspace.shared.icon(forFile: path)
+    }
+
+    private var fileName: String {
+        let path = (item.content as NSString).expandingTildeInPath
+        return (path as NSString).lastPathComponent
+    }
+
+    private var filePath: String {
+        let path = (item.content as NSString).expandingTildeInPath
+        let dir = (path as NSString).deletingLastPathComponent
+        let homeDir = NSHomeDirectory()
+        return dir.replacingOccurrences(of: homeDir, with: "~")
+    }
+
+    private var kindIcon: String {
+        switch item.kind {
+        case .text: return "doc.text"
+        case .image: return "photo"
+        case .url: return "link"
+        case .file: return "folder"
+        case .code: return "chevron.left.forwardslash.chevron.right"
+        }
+    }
+
+    private var kindColor: Color {
+        switch item.kind {
+        case .text: return .gray
+        case .image: return .purple
+        case .url: return .blue
+        case .file: return .yellow
+        case .code: return .green
         }
     }
 
