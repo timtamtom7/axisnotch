@@ -13,7 +13,6 @@ import Security
 
 // MARK: - Admin Authorization
 
-@MainActor
 final class AdminAuthorization: ObservableObject {
     static let shared = AdminAuthorization()
 
@@ -22,6 +21,7 @@ final class AdminAuthorization: ObservableObject {
 
     private init() {}
 
+    @MainActor
     func requestAdminAuthorization(reason: String) async -> Bool {
         var authItem = AuthorizationItem(name: kAuthorizationRightExecute, valueLength: 0, value: nil, flags: 0)
         var authRights = AuthorizationRights(count: 1, items: &authItem)
@@ -92,7 +92,6 @@ final class AdminAuthorization: ObservableObject {
 
 // MARK: - CleanerManager
 
-@MainActor
 final class CleanerManager: ObservableObject {
     static let shared = CleanerManager()
 
