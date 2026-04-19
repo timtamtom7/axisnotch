@@ -60,9 +60,6 @@ struct SettingsView: View {
                 NavigationLink(value: "Advanced") {
                     Label("Advanced", systemImage: "gearshape.2")
                 }
-                NavigationLink(value: "Tasks") {
-                    Label("Tasks & Tools", systemImage: "checklist")
-                }
                 NavigationLink(value: "About") {
                     Label("About", systemImage: "info.circle")
                 }
@@ -94,8 +91,6 @@ struct SettingsView: View {
                     GeneralSettings()
                 case "Advanced":
                     Advanced()
-                case "Tasks":
-                    TasksSettings()
                 case "About":
                     if let controller = updaterController {
                         About(updaterController: controller)
@@ -1796,101 +1791,6 @@ func warningBadge(_ text: String, _ description: String) -> some View {
             }
             Spacer()
         }
-    }
-}
-
-// MARK: - Tasks & Tools Settings
-
-struct TasksSettings: View {
-    // Tasks tab toggles
-    @Default(.showTasksTab) var showTasksTab
-    @Default(.showVoiceInput) var showVoiceInput
-    @Default(.showPomodoro) var showPomodoro
-    @Default(.showStopwatch) var showStopwatch
-    @Default(.showQuickNote) var showQuickNote
-    @Default(.showClipboardHistory) var showClipboardHistory
-
-    // Tools tab toggles
-    @Default(.showToolsTab) var showToolsTab
-    @Default(.showCalculator) var showCalculator
-    @Default(.showSystemInfo) var showSystemInfo
-    @Default(.showWeather) var showWeather
-    @Default(.showScreenshot) var showScreenshot
-    @Default(.showWorldClock) var showWorldClock
-    @Default(.showUSBDevices) var showUSBDevices
-    @Default(.showNotchControl) var showNotchControl
-    @Default(.showStorageInfo) var showStorageInfo
-    @Default(.showAppLauncher) var showAppLauncher
-    @Default(.showWaterTracker) var showWaterTracker
-
-    // AI settings
-    @Default(.aiProvider) var aiProvider
-
-    var body: some View {
-        Form {
-            Section {
-                Text("Show or hide features in the Tasks and Tools tabs. Hidden features will not appear in the notch.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-
-            Section {
-                Toggle("Show Tasks Tab", isOn: $showTasksTab)
-                Toggle("Show Voice Input", isOn: $showVoiceInput)
-                    .disabled(!showTasksTab)
-                Toggle("Show Pomodoro Timer", isOn: $showPomodoro)
-                    .disabled(!showTasksTab)
-                Toggle("Show Stopwatch", isOn: $showStopwatch)
-                    .disabled(!showTasksTab)
-                Toggle("Show Quick Note", isOn: $showQuickNote)
-                    .disabled(!showTasksTab)
-            } header: {
-                Text("Tasks Tab")
-            }
-
-            Section {
-                Toggle("Show Tools Tab", isOn: $showToolsTab)
-                Toggle("Show Calculator", isOn: $showCalculator)
-                    .disabled(!showToolsTab)
-                Toggle("Show System Info", isOn: $showSystemInfo)
-                    .disabled(!showToolsTab)
-                Toggle("Show Weather", isOn: $showWeather)
-                    .disabled(!showToolsTab)
-                Toggle("Show Screenshot Shortcut", isOn: $showScreenshot)
-                    .disabled(!showToolsTab)
-                Toggle("Show World Clock", isOn: $showWorldClock)
-                    .disabled(!showToolsTab)
-                Toggle("Show USB Devices", isOn: $showUSBDevices)
-                    .disabled(!showToolsTab)
-                Toggle("Show Notch Control", isOn: $showNotchControl)
-                    .disabled(!showToolsTab)
-                Toggle("Show Storage Info", isOn: $showStorageInfo)
-                    .disabled(!showToolsTab)
-                Toggle("Show App Launcher", isOn: $showAppLauncher)
-                    .disabled(!showToolsTab)
-                Toggle("Show Water Tracker", isOn: $showWaterTracker)
-                    .disabled(!showToolsTab)
-            } header: {
-                Text("Tools Tab")
-            }
-
-            Section {
-                Toggle("Show Clipboard History in Shelf", isOn: $showClipboardHistory)
-            } header: {
-                Text("Shelf Tab")
-            }
-
-            Section {
-                Picker("AI Provider", selection: $aiProvider) {
-                    Text("Apple Intelligence").tag("appleIntelligence")
-                    Text("Ollama (Local)").tag("ollama")
-                    Text("Cloud API").tag("cloudAPI")
-                }
-            } header: {
-                Text("AI Settings")
-            }
-        }
-        .navigationTitle("Tasks & Tools")
     }
 }
 

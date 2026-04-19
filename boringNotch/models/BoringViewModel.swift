@@ -11,7 +11,7 @@ import SwiftUI
 
 class BoringViewModel: NSObject, ObservableObject {
     @ObservedObject var coordinator = BoringViewCoordinator.shared
-    @ObservedObject var detector = FullscreenMediaDetector.shared
+    lazy var detector: FullscreenMediaDetector = FullscreenMediaDetector.shared
 
     let animationLibrary: BoringAnimations = .init()
     let animation: Animation?
@@ -67,21 +67,6 @@ class BoringViewModel: NSObject, ObservableObject {
             .store(in: &cancellables)
         
         setupDetectorObserver()
-        setupTabObserver()
-    }
-
-    private func setupTabObserver() {
-        coordinator.$currentView
-            .sink { [weak self] view in
-                guard let self = self, self.notchState == .open else { return }
-                self.notchSize = self.idealOpenSize(for: view)
-                NotificationCenter.default.post(name: .notchHeightChanged, object: nil)
-            }
-            .store(in: &cancellables)
-    }
-
-    func idealOpenSize(for view: NotchViews) -> CGSize {
-        return axisTabSizes[view] ?? openNotchSize
     }
     
     private func setupDetectorObserver() {
@@ -205,7 +190,7 @@ class BoringViewModel: NSObject, ObservableObject {
     }
 
     func open() {
-        self.notchSize = idealOpenSize(for: coordinator.currentView)
+        self.notchSize = openNotchSize
         self.notchState = .open
         
         // Force music information update when notch is opened

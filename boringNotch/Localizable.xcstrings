@@ -201,12 +201,6 @@
         }
       }
     },
-    "-" : {
-
-    },
-    "'%@'?" : {
-
-    },
     "'Now Playing' was the only option on previous versions and works with all media apps." : {
       "localizations" : {
         "ar" : {
@@ -707,28 +701,7 @@
         }
       }
     },
-    "%@ / %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ / %2$@"
-          }
-        }
-      }
-    },
-    "%@ / %@ used" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ / %2$@ used"
-          }
-        }
-      }
-    },
     "%d%%" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -928,16 +901,6 @@
         }
       }
     },
-    "%lld/%lld" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$lld/%2$lld"
-          }
-        }
-      }
-    },
     "%lld%%" : {
       "localizations" : {
         "ar" : {
@@ -1037,9 +1000,6 @@
           }
         }
       }
-    },
-    "%lldm" : {
-
     },
     "• Bug fixes" : {
       "localizations" : {
@@ -1340,9 +1300,6 @@
           }
         }
       }
-    },
-    "+%lld more" : {
-
     },
     "About" : {
       "localizations" : {
@@ -1844,12 +1801,6 @@
         }
       }
     },
-    "Add App" : {
-
-    },
-    "Add City" : {
-
-    },
     "Add manually" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2051,12 +2002,6 @@
         }
       }
     },
-    "Add Note" : {
-
-    },
-    "Add task..." : {
-
-    },
     "Additional features" : {
       "localizations" : {
         "ar" : {
@@ -2256,12 +2201,6 @@
           }
         }
       }
-    },
-    "AI Provider" : {
-
-    },
-    "AI Settings" : {
-
     },
     "All-day" : {
       "localizations" : {
@@ -2862,21 +2801,6 @@
           }
         }
       }
-    },
-    "Apple Intelligence" : {
-
-    },
-    "Apps" : {
-
-    },
-    "Apps: %@" : {
-
-    },
-    "Are you sure you want to remove %@?" : {
-
-    },
-    "Authorization Required" : {
-
     },
     "Auto-scroll to next event" : {
       "localizations" : {
@@ -3978,18 +3902,6 @@
         }
       }
     },
-    "Browser: %@" : {
-
-    },
-    "Cache Cleaned" : {
-
-    },
-    "Cache cleanup completed successfully." : {
-
-    },
-    "Calculator" : {
-
-    },
     "Calendar" : {
       "localizations" : {
         "ar" : {
@@ -4389,12 +4301,6 @@
           }
         }
       }
-    },
-    "Capture" : {
-
-    },
-    "Captured!" : {
-
     },
     "Change media with horizontal gestures" : {
       "localizations" : {
@@ -5296,18 +5202,6 @@
         }
       }
     },
-    "Clean" : {
-
-    },
-    "Clean All" : {
-
-    },
-    "Clean Cache" : {
-
-    },
-    "Cleaner" : {
-
-    },
     "Clear slot" : {
       "localizations" : {
         "ar" : {
@@ -5407,9 +5301,6 @@
           }
         }
       }
-    },
-    "Clipboard" : {
-
     },
     "Close" : {
       "localizations" : {
@@ -5710,9 +5601,6 @@
           }
         }
       }
-    },
-    "Cloud API" : {
-
     },
     "Color Presets" : {
       "localizations" : {
@@ -6113,9 +6001,6 @@
           }
         }
       }
-    },
-    "Copy" : {
-
     },
     "Copy items on drag" : {
       "localizations" : {
@@ -7117,9 +7002,6 @@
         }
       }
     },
-    "Daily Goal:" : {
-
-    },
     "Default" : {
       "localizations" : {
         "ar" : {
@@ -7219,9 +7101,6 @@
           }
         }
       }
-    },
-    "Delete" : {
-
     },
     "Description" : {
       "extractionState" : "stale",
@@ -7323,9 +7202,6 @@
           }
         }
       }
-    },
-    "Details" : {
-
     },
     "Disable" : {
       "extractionState" : "stale",
@@ -7528,9 +7404,6 @@
           }
         }
       }
-    },
-    "Done" : {
-
     },
     "Download" : {
       "localizations" : {
@@ -8033,9 +7906,6 @@
         }
       }
     },
-    "Due:" : {
-
-    },
     "Easily copy, store, and manage your most-used content. Upgrade now for advanced features like multi-item storage and quick access!" : {
       "localizations" : {
         "ar" : {
@@ -8136,9 +8006,6 @@
         }
       }
     },
-    "Edit" : {
-
-    },
     "Edit layout" : {
       "localizations" : {
         "ar" : {
@@ -8238,9 +8105,6 @@
           }
         }
       }
-    },
-    "Eject" : {
-
     },
     "Enable blur effect behind album art" : {
       "localizations" : {
@@ -10543,9 +10407,6 @@
           }
         }
       }
-    },
-    "Hide" : {
-
     },
     "Hide all-day events" : {
       "localizations" : {
@@ -14548,9 +14409,6 @@
         }
       }
     },
-    "Network: %@" : {
-
-    },
     "Never hide" : {
       "localizations" : {
         "ar" : {
@@ -14650,9 +14508,6 @@
           }
         }
       }
-    },
-    "No cities added" : {
-
     },
     "No custom animation available" : {
       "localizations" : {
@@ -14853,9 +14708,6 @@
           }
         }
       }
-    },
-    "No devices" : {
-
     },
     "No events" : {
       "localizations" : {
@@ -15158,15 +15010,6 @@
         }
       }
     },
-    "No screenshots" : {
-
-    },
-    "No tasks — speak or type above" : {
-
-    },
-    "Not Connected" : {
-
-    },
     "Not Now" : {
       "localizations" : {
         "ar" : {
@@ -15266,9 +15109,6 @@
           }
         }
       }
-    },
-    "Notch" : {
-
     },
     "Notch behavior" : {
       "localizations" : {
@@ -15669,15 +15509,6 @@
           }
         }
       }
-    },
-    "Notes" : {
-
-    },
-    "OK" : {
-
-    },
-    "Ollama (Local)" : {
-
     },
     "Open Calendar Settings" : {
       "localizations" : {
@@ -16279,9 +16110,6 @@
         }
       }
     },
-    "Password: " : {
-
-    },
     "Pick a Color" : {
       "localizations" : {
         "ar" : {
@@ -16381,9 +16209,6 @@
           }
         }
       }
-    },
-    "Pin" : {
-
     },
     "Plugged In" : {
       "localizations" : {
@@ -16485,9 +16310,6 @@
         }
       }
     },
-    "Pomodoro" : {
-
-    },
     "Preferred display" : {
       "localizations" : {
         "ar" : {
@@ -16588,9 +16410,6 @@
         }
       }
     },
-    "Priority:" : {
-
-    },
     "Progress bar style" : {
       "localizations" : {
         "ar" : {
@@ -16690,9 +16509,6 @@
           }
         }
       }
-    },
-    "Quick Notes" : {
-
     },
     "Quick Share" : {
       "localizations" : {
@@ -17094,9 +16910,6 @@
         }
       }
     },
-    "Recent Files" : {
-
-    },
     "Release name" : {
       "localizations" : {
         "ar" : {
@@ -17496,18 +17309,6 @@
           }
         }
       }
-    },
-    "Remove" : {
-
-    },
-    "Remove %@" : {
-
-    },
-    "Remove City" : {
-
-    },
-    "Remove from Launcher" : {
-
     },
     "Remove from shelf after dragging" : {
       "localizations" : {
@@ -18311,24 +18112,6 @@
         }
       }
     },
-    "Scan to share" : {
-
-    },
-    "Screenshot" : {
-
-    },
-    "Screenshots" : {
-
-    },
-    "Search apps..." : {
-
-    },
-    "Search cities..." : {
-
-    },
-    "Search clipboard..." : {
-
-    },
     "Select the music source you want to use. You can change this later in the app settings." : {
       "localizations" : {
         "ar" : {
@@ -18629,9 +18412,6 @@
         }
       }
     },
-    "sessions today" : {
-
-    },
     "Settings" : {
       "localizations" : {
         "ar" : {
@@ -18731,9 +18511,6 @@
           }
         }
       }
-    },
-    "Share" : {
-
     },
     "Shelf" : {
       "localizations" : {
@@ -18835,9 +18612,6 @@
         }
       }
     },
-    "Shelf Tab" : {
-
-    },
     "Shortcuts" : {
       "localizations" : {
         "ar" : {
@@ -18937,12 +18711,6 @@
           }
         }
       }
-    },
-    "Show" : {
-
-    },
-    "Show App Launcher" : {
-
     },
     "Show battery indicator" : {
       "localizations" : {
@@ -19144,9 +18912,6 @@
         }
       }
     },
-    "Show Calculator" : {
-
-    },
     "Show calendar" : {
       "localizations" : {
         "ar" : {
@@ -19246,9 +19011,6 @@
           }
         }
       }
-    },
-    "Show Clipboard History in Shelf" : {
-
     },
     "Show cool face animation while inactive" : {
       "localizations" : {
@@ -19750,9 +19512,6 @@
         }
       }
     },
-    "Show Notch Control" : {
-
-    },
     "Show notch on lock screen" : {
       "localizations" : {
         "ar" : {
@@ -19953,9 +19712,6 @@
         }
       }
     },
-    "Show or hide features in the Tasks and Tools tabs. Hidden features will not appear in the notch." : {
-
-    },
     "Show percentage" : {
       "localizations" : {
         "ar" : {
@@ -20055,9 +19811,6 @@
           }
         }
       }
-    },
-    "Show Pomodoro Timer" : {
-
     },
     "Show power status icons" : {
       "localizations" : {
@@ -20259,12 +20012,6 @@
         }
       }
     },
-    "Show Quick Note" : {
-
-    },
-    "Show Screenshot Shortcut" : {
-
-    },
     "Show settings icon in notch" : {
       "localizations" : {
         "ar" : {
@@ -20464,39 +20211,6 @@
           }
         }
       }
-    },
-    "Show Stopwatch" : {
-
-    },
-    "Show Storage Info" : {
-
-    },
-    "Show System Info" : {
-
-    },
-    "Show Tasks Tab" : {
-
-    },
-    "Show Tools Tab" : {
-
-    },
-    "Show USB Devices" : {
-
-    },
-    "Show Voice Input" : {
-
-    },
-    "Show Water Tracker" : {
-
-    },
-    "Show Weather" : {
-
-    },
-    "Show World Clock" : {
-
-    },
-    "Skip" : {
-
     },
     "Slider color" : {
       "localizations" : {
@@ -21199,12 +20913,6 @@
         }
       }
     },
-    "Stopwatch" : {
-
-    },
-    "Storage" : {
-
-    },
     "Support Us" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -21506,18 +21214,6 @@
         }
       }
     },
-    "Tap + to add note" : {
-
-    },
-    "Tasks & Tools" : {
-
-    },
-    "Tasks Tab" : {
-
-    },
-    "This will remove browser caches, app caches, and logs. Some data may be recreated on next launch." : {
-
-    },
     "Time to Full Charge: %lld min" : {
       "localizations" : {
         "ar" : {
@@ -21618,9 +21314,6 @@
         }
       }
     },
-    "Time:" : {
-
-    },
     "Tint progress bar with accent color" : {
       "localizations" : {
         "ar" : {
@@ -21720,9 +21413,6 @@
           }
         }
       }
-    },
-    "Title" : {
-
     },
     "Toggle Notch Open:" : {
       "localizations" : {
@@ -21923,12 +21613,6 @@
           }
         }
       }
-    },
-    "Tools Tab" : {
-
-    },
-    "Total:" : {
-
     },
     "Two-finger swipe up on notch to close, two-finger swipe down on notch to open when **Open notch on hover** option is disabled" : {
       "localizations" : {
@@ -22431,12 +22115,6 @@
         }
       }
     },
-    "Unpin" : {
-
-    },
-    "Update Note" : {
-
-    },
     "Upgrade to Pro" : {
       "localizations" : {
         "ar" : {
@@ -22536,9 +22214,6 @@
           }
         }
       }
-    },
-    "USB" : {
-
     },
     "Use music visualizer spectrogram" : {
       "localizations" : {
@@ -23140,12 +22815,6 @@
         }
       }
     },
-    "Weather" : {
-
-    },
-    "Weekly Progress" : {
-
-    },
     "Welcome" : {
       "localizations" : {
         "ar" : {
@@ -23346,12 +23015,6 @@
         }
       }
     },
-    "WiFi Share" : {
-
-    },
-    "WiFi Sharing" : {
-
-    },
     "Window Appearance" : {
       "localizations" : {
         "ar" : {
@@ -23551,9 +23214,6 @@
           }
         }
       }
-    },
-    "World Clock" : {
-
     },
     "You can now enjoy the app. If you want to tweak things further, you can always visit the settings." : {
       "localizations" : {

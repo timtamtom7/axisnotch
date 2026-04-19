@@ -17,67 +17,64 @@ struct ShelfView: View {
     @ObservedObject private var clipboardManager = ClipboardManager.shared
     @State private var searchQuery: String = ""
 
-    @Default(.showClipboardHistory) private var showClipboardHistory
-
     private let spacing: CGFloat = 8
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            // Files section — fixed height row
+        VStack(alignment: .leading, spacing: 8) {
+            // Files section
             HStack(spacing: 12) {
                 FileShareView()
                     .aspectRatio(1, contentMode: .fit)
-                    .frame(height: 100)
                     .environmentObject(vm)
 
                 panel
-                    .frame(height: 100)
                     .onDrop(of: [.fileURL, .url, .utf8PlainText, .plainText, .data], isTargeted: $vm.dragDetectorTargeting) { providers in
                         handleDrop(providers: providers)
                     }
             }
 
-            if showClipboardHistory {
-                Divider()
-                    .background(Color.white.opacity(0.1))
+            Divider()
+                .background(Color.white.opacity(0.1))
 
-                // Clipboard section
-                HStack(spacing: 6) {
-                    Image(systemName: "clipboard")
-                        .font(.system(size: 9))
-                        .foregroundColor(.gray)
+            // Clipboard section
+            HStack(spacing: 6) {
+                Image(systemName: "clipboard")
+                    .font(.system(size: 10))
+                    .foregroundColor(.gray)
 
-                    Text("Clipboard")
-                        .font(.system(size: 9, weight: .semibold))
-                        .foregroundColor(.gray)
+                Text("Clipboard")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundColor(.gray)
 
-                    Spacer()
+                Spacer()
 
-                    Image(systemName: "magnifyingglass")
-                        .font(.system(size: 8))
-                        .foregroundColor(.gray)
+                // Search
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 9))
+                    .foregroundColor(.gray)
 
-                    TextField("", text: $searchQuery)
-                        .textFieldStyle(.plain)
-                        .font(.system(size: 9))
-                        .frame(width: 70)
-                        .foregroundColor(.white)
-                }
+                TextField("", text: $searchQuery)
+                    .textFieldStyle(.plain)
+                    .font(.system(size: 10))
+                    .frame(width: 80)
+                    .foregroundColor(.white)
+            }
+            .padding(.horizontal, 8)
 
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 6) {
-                        ForEach(filteredClipboard) { item in
-                            ClipboardCard(item: item) {
-                                clipboardManager.copyToClipboard(item)
-                            } onPin: {
-                                clipboardManager.togglePinned(item)
-                            }
+            // Clipboard cards horizontal scroll
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(filteredClipboard) { item in
+                        ClipboardCard(item: item) {
+                            clipboardManager.copyToClipboard(item)
+                        } onPin: {
+                            clipboardManager.togglePinned(item)
                         }
                     }
-                    .scrollTargetLayout()
                 }
-                .scrollTargetBehavior(.viewAligned)
+                .scrollTargetLayout()
             }
+            .scrollTargetBehavior(.viewAligned)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
@@ -178,35 +175,17 @@ struct ClipboardCard: View {
     let onCopy: () -> Void
     let onPin: () -> Void
 
-    @State private var isExpanded: Bool = false
-
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            // Rich preview based on item kind
-            Group {
-                switch item.kind {
-                case .image:
-                    imagePreview
-                case .url:
-                    urlPreview
-                case .file:
-                    filePreview
-                case .code:
-                    codePreview
-                case .text:
-                    textPreview
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            Text(item.content)
+                .font(.system(size: 10))
+                .foregroundColor(.white)
+                .lineLimit(3)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             Spacer()
 
             HStack {
-                // Kind indicator
-                Image(systemName: kindIcon)
-                    .font(.system(size: 7))
-                    .foregroundColor(kindColor)
-
                 Text(formatTime(item.timestamp))
                     .font(.system(size: 8))
                     .foregroundColor(.gray)
@@ -227,150 +206,16 @@ struct ClipboardCard: View {
                 .buttonStyle(.plain)
             }
         }
-        .padding(6)
-        .frame(width: isExpanded ? 150 : 110, height: isExpanded ? 100 : 70)
-        .background(.ultraThinMaterial)
-        .cornerRadius(12)
+        .padding(8)
+        .frame(width: 120, height: 80)
+        .background(Color.white.opacity(0.08))
+        .cornerRadius(8)
         .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(item.isPinned ? Color.orange.opacity(0.4) : Color.white.opacity(0.15), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(item.isPinned ? Color.orange.opacity(0.4) : Color.clear, lineWidth: 1)
         )
         .onTapGesture {
             onCopy()
-        }
-        .onTapGesture(count: 2) {
-            withAnimation(.easeInOut(duration: 0.2)) {
-                isExpanded.toggle()
-            }
-        }
-        .contextMenu {
-            Button(action: onCopy) {
-                Label("Copy", systemImage: "doc.on.doc")
-            }
-            Button(action: onPin) {
-                Label(item.isPinned ? "Unpin" : "Pin", systemImage: item.isPinned ? "pin.slash" : "pin")
-            }
-            Divider()
-            Button(role: .destructive, action: {}) {
-                Label("Delete", systemImage: "trash")
-            }
-        }
-    }
-
-    // MARK: - Preview Views
-
-    @ViewBuilder
-    private var imagePreview: some View {
-        if let imageData = item.imageData,
-           let nsImage = NSImage(data: imageData) {
-            Image(nsImage: nsImage)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(maxHeight: isExpanded ? 60 : 40)
-                .cornerRadius(4)
-        } else {
-            Image(systemName: "photo")
-                .font(.system(size: 20))
-                .foregroundColor(.gray)
-        }
-    }
-
-    @ViewBuilder
-    private var urlPreview: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            // Favicon placeholder
-            Image(systemName: "globe")
-                .font(.system(size: 12))
-                .foregroundColor(.blue)
-
-            Text(item.content)
-                .font(.system(size: 9))
-                .foregroundColor(.white)
-                .lineLimit(isExpanded ? 3 : 2)
-                .truncationMode(.middle)
-        }
-    }
-
-    @ViewBuilder
-    private var filePreview: some View {
-        HStack(spacing: 4) {
-            Image(nsImage: fileIcon)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 20, height: 20)
-
-            VStack(alignment: .leading, spacing: 1) {
-                Text(fileName)
-                    .font(.system(size: 9, weight: .medium))
-                    .foregroundColor(.white)
-                    .lineLimit(1)
-
-                if isExpanded {
-                    Text(filePath)
-                        .font(.system(size: 7))
-                        .foregroundColor(.gray)
-                        .lineLimit(1)
-                        .truncationMode(.middle)
-                }
-            }
-        }
-    }
-
-    @ViewBuilder
-    private var codePreview: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            Text(item.content)
-                .font(.system(size: 8, design: .monospaced))
-                .foregroundColor(Color.green.opacity(0.9))
-                .lineLimit(isExpanded ? 6 : 3)
-        }
-    }
-
-    @ViewBuilder
-    private var textPreview: some View {
-        Text(item.content)
-            .font(.system(size: 10))
-            .foregroundColor(.white)
-            .lineLimit(isExpanded ? 6 : 3)
-            .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    // MARK: - Helpers
-
-    private var fileIcon: NSImage {
-        let path = (item.content as NSString).expandingTildeInPath
-        return NSWorkspace.shared.icon(forFile: path)
-    }
-
-    private var fileName: String {
-        let path = (item.content as NSString).expandingTildeInPath
-        return (path as NSString).lastPathComponent
-    }
-
-    private var filePath: String {
-        let path = (item.content as NSString).expandingTildeInPath
-        let dir = (path as NSString).deletingLastPathComponent
-        let homeDir = NSHomeDirectory()
-        return dir.replacingOccurrences(of: homeDir, with: "~")
-    }
-
-    private var kindIcon: String {
-        switch item.kind {
-        case .text: return "doc.text"
-        case .image: return "photo"
-        case .url: return "link"
-        case .file: return "folder"
-        case .code: return "chevron.left.forwardslash.chevron.right"
-        }
-    }
-
-    private var kindColor: Color {
-        switch item.kind {
-        case .text: return .gray
-        case .image: return .purple
-        case .url: return .blue
-        case .file: return .yellow
-        case .code: return .green
         }
     }
 

@@ -8,7 +8,6 @@
 import Defaults
 import EventKit
 import SwiftUI
-import UserNotifications
 
 // MARK: - CalendarManager
 
@@ -24,23 +23,16 @@ class CalendarManager: ObservableObject {
     @Published var selectedCalendarIDs: Set<String> = []
     @Published var calendarAuthorizationStatus: EKAuthorizationStatus = .notDetermined
     @Published var reminderAuthorizationStatus: EKAuthorizationStatus = .notDetermined
-    @Published var upcomingAlertEvent: EventModel?
-    @Published var countdownEvent: EventModel?
-    @Published var showCalendarAlert: Bool = false
-
     private var selectedCalendars: [CalendarModel] = []
     private let calendarService = CalendarService()
+
     private var eventStoreChangedObserver: NSObjectProtocol?
-    private var alertCheckTask: Task<Void, Never>?
-    private var dismissedAlertEventIds: Set<String> = []
 
     private init() {
         self.currentWeekStartDate = CalendarManager.startOfDay(Date())
         setupEventStoreChangedObserver()
         Task {
             await reloadCalendarAndReminderLists()
-            await requestNotificationPermission()
-            startMonitoringForAlerts()
         }
     }
 
@@ -48,7 +40,6 @@ class CalendarManager: ObservableObject {
         if let observer = eventStoreChangedObserver {
             NotificationCenter.default.removeObserver(observer)
         }
-        alertCheckTask?.cancel()
     }
 
     private func setupEventStoreChangedObserver() {
@@ -61,123 +52,6 @@ class CalendarManager: ObservableObject {
                 await self?.reloadCalendarAndReminderLists()
             }
         }
-    }
-
-    private func requestNotificationPermission() async {
-        let center = UNUserNotificationCenter.current()
-        do {
-            let granted = try await center.requestAuthorization(options: [.alert, .sound, .badge])
-            print("📅 Notification permission granted: \(granted)")
-        } catch {
-            print("📅 Notification permission error: \(error)")
-        }
-    }
-
-    func startMonitoringForAlerts() {
-        alertCheckTask?.cancel()
-        alertCheckTask = Task {
-            while !Task.isCancelled {
-                await checkForUpcomingEvents()
-                try? await Task.sleep(for: .seconds(30)) // Check every 30 seconds
-            }
-        }
-    }
-
-    private func checkForUpcomingEvents() async {
-        guard Defaults[.showCalendarAlerts] else {
-            await MainActor.run {
-                self.upcomingAlertEvent = nil
-                self.countdownEvent = nil
-                self.showCalendarAlert = false
-            }
-            return
-        }
-
-        let now = Date()
-        let fifteenMinutesFromNow = now.addingTimeInterval(15 * 60)
-        let oneHourFromNow = now.addingTimeInterval(60 * 60)
-
-        // Find events that are starting within 15 minutes (for alert)
-        let upcomingAlert = events.first { event in
-            guard !event.isAllDay, !event.type.isReminder else { return false }
-            let eventStart = event.start
-            let isStartingSoon = eventStart > now && eventStart <= fifteenMinutesFromNow
-            let notDismissed = !dismissedAlertEventIds.contains(event.id)
-            return isStartingSoon && notDismissed
-        }
-
-        // Find events starting within 1 hour (for countdown)
-        let countdown = events.first { event in
-            guard !event.isAllDay, !event.type.isReminder else { return false }
-            let eventStart = event.start
-            let isWithinHour = eventStart > now && eventStart <= oneHourFromNow
-            return isWithinHour
-        }
-
-        await MainActor.run {
-            if let alert = upcomingAlert, alert.id != upcomingAlertEvent?.id {
-                // New alert event detected
-                upcomingAlertEvent = alert
-                showCalendarAlert = true
-                scheduleNotification(for: alert)
-            } else if upcomingAlert == nil {
-                upcomingAlertEvent = nil
-                if countdown == nil {
-                    showCalendarAlert = false
-                }
-            }
-
-            countdownEvent = countdown
-        }
-    }
-
-    private func scheduleNotification(for event: EventModel) {
-        let center = UNUserNotificationCenter.current()
-
-        let content = UNMutableNotificationContent()
-        content.title = "Upcoming Event"
-        content.body = "\(event.title) starts in \(timeUntil(event.start))"
-        content.sound = .default
-
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
-        let request = UNNotificationRequest(identifier: event.id, content: content, trigger: trigger)
-
-        center.add(request) { error in
-            if let error = error {
-                print("📅 Failed to schedule notification: \(error)")
-            }
-        }
-    }
-
-    private func timeUntil(_ date: Date) -> String {
-        let interval = date.timeIntervalSinceNow
-        let minutes = Int(interval / 60)
-
-        if minutes < 1 {
-            return "less than a minute"
-        } else if minutes == 1 {
-            return "1 minute"
-        } else if minutes < 60 {
-            return "\(minutes) minutes"
-        } else {
-            let hours = minutes / 60
-            return hours == 1 ? "1 hour" : "\(hours) hours"
-        }
-    }
-
-    func dismissAlert() {
-        if let event = upcomingAlertEvent {
-            dismissedAlertEventIds.insert(event.id)
-        }
-        showCalendarAlert = false
-        upcomingAlertEvent = nil
-    }
-
-    func openCalendarApp() {
-        if let url = URL(string: "x-apple-system://calendar") {
-            NSWorkspace.shared.open(url)
-        }
-        dismissAlert()
     }
 
     @MainActor
@@ -225,7 +99,7 @@ class CalendarManager: ObservableObject {
             print("Unknown authorization status")
         }
     }
-
+    
     func checkReminderAuthorization() async {
         let status = EKEventStore.authorizationStatus(for: .reminder)
         DispatchQueue.main.async {
@@ -254,7 +128,7 @@ class CalendarManager: ObservableObject {
             print("Unknown authorization status")
         }
     }
-
+        
 
     func updateSelectedCalendars() {
         // Populate selectedCalendarIDs based on Defaults calendar selection state
@@ -318,7 +192,7 @@ class CalendarManager: ObservableObject {
         )
         self.events = eventsResult
     }
-
+    
     func setReminderCompleted(reminderID: String, completed: Bool) async {
         await calendarService.setReminderCompleted(reminderID: reminderID, completed: completed)
         // Refresh events after updating

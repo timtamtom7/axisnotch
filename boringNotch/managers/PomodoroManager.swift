@@ -7,7 +7,6 @@
 
 import Foundation
 import SwiftUI
-import Defaults
 
 final class PomodoroManager: ObservableObject {
     static let shared = PomodoroManager()
@@ -15,8 +14,6 @@ final class PomodoroManager: ObservableObject {
     @Published var secondsRemaining: Int = 25 * 60
     @Published var isRunning: Bool = false
     @Published var sessionsCompleted: Int = 0
-    @Published var isBreak: Bool = false
-    @Published var showLiveActivityCompact: Bool = false
 
     private var timerTask: Task<Void, Never>?
 
@@ -40,17 +37,15 @@ final class PomodoroManager: ObservableObject {
 
     func start() {
         isRunning = true
-        if Defaults[.showLiveActivity] {
-            showLiveActivityCompact = true
-        }
         timerTask = Task {
             while !Task.isCancelled && isRunning && secondsRemaining > 0 {
                 try? await Task.sleep(for: .seconds(1))
-                guard !Task.isCancelled else { break }
-                await MainActor.run {
-                    self.secondsRemaining -= 1
-                    if self.secondsRemaining == 0 {
-                        self.onSessionComplete()
+                if !Task.isCancelled {
+                    await MainActor.run {
+                        self.secondsRemaining -= 1
+                        if self.secondsRemaining == 0 {
+                            self.onSessionComplete()
+                        }
                     }
                 }
             }
@@ -66,16 +61,11 @@ final class PomodoroManager: ObservableObject {
     func reset() {
         pause()
         secondsRemaining = sessionDuration
-        isBreak = false
-        showLiveActivityCompact = false
     }
 
     private func onSessionComplete() {
         pause()
         sessionsCompleted += 1
-
-        // Record session to history
-        PomodoroHistoryManager.shared.recordSession()
 
         // Play chime and flash notch border
         AudioPlayer.shared.playChime()
@@ -85,7 +75,6 @@ final class PomodoroManager: ObservableObject {
         startLiveActivity()
         #endif
 
-        isBreak = sessionsCompleted % 4 == 0
         if sessionsCompleted % 4 == 0 {
             secondsRemaining = longBreakDuration
         } else {
@@ -99,17 +88,6 @@ final class PomodoroManager: ObservableObject {
         // This is intentionally empty as ActivityKit is iOS-only
     }
     #endif
-
-    var formattedTime: String {
-        let minutes = secondsRemaining / 60
-        let seconds = secondsRemaining % 60
-        return String(format: "%d:%02d", minutes, seconds)
-    }
-
-    var progress: Double {
-        let totalDuration = isBreak ? (sessionsCompleted % 4 == 0 ? longBreakDuration : breakDuration) : sessionDuration
-        return Double(totalDuration - secondsRemaining) / Double(totalDuration)
-    }
 }
 
 extension Notification.Name {

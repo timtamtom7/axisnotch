@@ -19,82 +19,44 @@ struct AxisTasksView: View {
     @State private var pendingDetailTask: AxisTask? = nil
     @State private var detailOverlayVisible: Bool = false
 
-    @Default(.showVoiceInput) private var showVoiceInput
-    @Default(.showPomodoro) private var showPomodoro
-    @Default(.showStopwatch) private var showStopwatch
-    @Default(.showQuickNote) private var showQuickNote
-
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            // Compact input bar
-            HStack(spacing: 6) {
-                if showVoiceInput {
-                    Button(action: { VoiceInputManager.shared.toggle() }) {
-                        ZStack {
-                            Image(systemName: VoiceInputManager.shared.isListening ? "mic.fill" : "mic")
-                                .font(.system(size: 11))
-                                .foregroundColor(VoiceInputManager.shared.isListening ? .red : .gray)
+        VStack(alignment: .leading, spacing: 8) {
+            // Voice input bar
+            HStack {
+                Image(systemName: "mic.fill")
+                    .foregroundColor(.red)
+                    .font(.system(size: 12))
 
-                            if VoiceInputManager.shared.isListening {
-                                // Pulsing animation
-                                Circle()
-                                    .stroke(Color.red.opacity(0.5), lineWidth: 2)
-                                    .frame(width: 20, height: 20)
-                                    .scaleEffect(VoiceInputManager.shared.isListening ? 1.5 : 1)
-                                    .opacity(VoiceInputManager.shared.isListening ? 0 : 1)
-                                    .animation(.easeOut(duration: 1).repeatForever(autoreverses: false), value: VoiceInputManager.shared.isListening)
-                            }
-                        }
-                    }
-                    .buttonStyle(.plain)
-                }
-
-                TextField("Add task...", text: $taskInput)
+                TextField("Add task or tap mic...", text: $taskInput)
                     .textFieldStyle(.plain)
-                    .font(.system(size: 11))
+                    .font(.system(size: 12))
                     .foregroundColor(.white)
 
                 Button(action: parseTasks) {
                     Image(systemName: "sparkles")
-                        .font(.system(size: 11))
-                        .foregroundColor(taskInput.isEmpty ? .gray : .white)
+                        .font(.system(size: 12))
+                        .foregroundColor(.white)
                 }
                 .buttonStyle(.plain)
                 .disabled(taskInput.isEmpty || isProcessing)
 
-                if isProcessing {
-                    ProgressView()
-                        .scaleEffect(0.5)
-                        .frame(width: 14, height: 14)
+                Button(action: {
+                    VoiceInputManager.shared.toggle()
+                }) {
+                    Image(systemName: VoiceInputManager.shared.isListening ? "mic.fill" : "mic")
+                        .font(.system(size: 12))
+                        .foregroundColor(VoiceInputManager.shared.isListening ? .red : .gray)
                 }
+                .buttonStyle(.plain)
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 7)
-            .background(.ultraThinMaterial)
+            .padding(8)
+            .background(Color.white.opacity(0.1))
             .cornerRadius(8)
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color.white.opacity(0.15), lineWidth: 0.5)
-            )
 
-            // Voice transcription display
-            if showVoiceInput && !VoiceInputManager.shared.transcription.isEmpty {
-                HStack {
-                    Image(systemName: "waveform")
-                        .font(.system(size: 9))
-                        .foregroundColor(.green)
-                    Text(VoiceInputManager.shared.transcription)
-                        .font(.system(size: 9))
-                        .foregroundColor(.gray)
-                        .lineLimit(1)
-                }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 4)
-            }
-
-            // Card row
+            // Horizontal scroll: tasks + productivity tools
             ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack(spacing: 8) {
+                LazyHStack(spacing: 10) {
+                    // Task cards
                     ForEach(tasks) { task in
                         AxisTaskCard(
                             task: task,
@@ -102,34 +64,51 @@ struct AxisTasksView: View {
                             onTap: { toggleExpand(task.id) },
                             onToggle: { toggleTask(task) },
                             onDelete: { deleteTask(task) },
-                            onExpandDetails: { showDetailOverlay(task) },
-                            onSaveDetails: { updatedTask in
-                                updateTaskDetails(updatedTask)
-                            }
+                            onExpandDetails: { showDetailOverlay(task) }
                         )
                     }
 
-                    if showPomodoro { PomodoroToolCard() }
-                    if showStopwatch { StopwatchToolCard() }
-                    if showQuickNote { NoteToolCard() }
+                    // Pomodoro card
+                    CompactPomodoroCard()
+
+                    // Stopwatch card
+                    CompactStopwatchCard()
+
+                    // Note card
+                    CompactNoteCard()
                 }
                 .scrollTargetLayout()
             }
             .scrollTargetBehavior(.viewAligned)
+            .sensoryFeedback(.alignment, trigger: 0)
 
-            // Empty state
-            if tasks.isEmpty && !showPomodoro && !showStopwatch && !showQuickNote {
-                Text("No tasks — speak or type above")
-                    .font(.system(size: 10))
-                    .foregroundColor(.gray)
-                    .frame(maxWidth: .infinity)
+            if tasks.isEmpty {
+                HStack {
+                    Spacer()
+                    VStack(spacing: 4) {
+                        Image(systemName: "checkmark.circle")
+                            .font(.system(size: 20))
+                            .foregroundColor(.gray)
+                        Text("No tasks — tap mic or type above")
+                            .font(.system(size: 10))
+                            .foregroundColor(.gray)
+                    }
+                    Spacer()
+                }
+                .padding(.top, 4)
             }
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 6)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
         .onAppear {
-            loadPersistedTasks()
-            setupVoiceInputObserver()
+            NotificationCenter.default.publisher(for: .voiceInputCompleted)
+                .compactMap { $0.userInfo?["transcription"] as? String }
+                .sink { transcription in
+                    Task {
+                        await parseTasksFromAI(transcription: transcription)
+                    }
+                }
+                .store(in: &cancellables)
         }
         .overlay(alignment: .bottom) {
             if detailOverlayVisible, let task = pendingDetailTask {
@@ -137,54 +116,41 @@ struct AxisTasksView: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
-        .animation(.easeInOut(duration: 0.2), value: detailOverlayVisible)
+        .animation(.easeInOut(duration: 0.25), value: detailOverlayVisible)
     }
 
-    private func setupVoiceInputObserver() {
-        NotificationCenter.default.publisher(for: .voiceInputCompleted)
-            .compactMap { $0.userInfo?["transcription"] as? String }
-            .sink { transcription in
-                Task { await parseTasksFromAI(transcription: transcription) }
-            }
-            .store(in: &cancellables)
-    }
-
-    private func loadPersistedTasks() {
-        if let data = UserDefaults.standard.data(forKey: "persistedAxisTasks"),
-           let saved = try? JSONDecoder().decode([AxisTask].self, from: data) {
-            tasks = saved
-        }
-    }
-
-    private func persistTasks() {
-        if let data = try? JSONEncoder().encode(tasks) {
-            UserDefaults.standard.set(data, forKey: "persistedAxisTasks")
-        }
-    }
-
-    private func toggleExpand(_ id: UUID) {
-        expandedTaskId = (expandedTaskId == id) ? nil : id
+    private func toggleExpand(_ taskId: UUID) {
+        expandedTaskId = (expandedTaskId == taskId) ? nil : taskId
     }
 
     private func showDetailOverlay(_ task: AxisTask) {
         pendingDetailTask = task
         detailOverlayVisible = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
-            withAnimation { detailOverlayVisible = false; pendingDetailTask = nil }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            withAnimation {
+                self.detailOverlayVisible = false
+                self.pendingDetailTask = nil
+            }
         }
     }
 
     private func parseTasksFromAI(transcription: String) async {
         await MainActor.run { isProcessing = true }
         do {
-            let parsed = try await AIParserService.shared.parse(transcription: transcription)
+            let parsedTasks = try await AIParserService.shared.parse(transcription: transcription)
             await MainActor.run {
-                for p in parsed {
-                    let newTask = AxisTask(title: p.title, priority: p.priority, isCompleted: false, timeEstimate: p.timeEstimate, deadline: p.deadline)
-                    tasks.append(newTask)
+                let startIndex = tasks.count
+                for parsed in parsedTasks {
+                    tasks.append(AxisTask(
+                        title: parsed.title,
+                        priority: parsed.priority,
+                        isCompleted: false,
+                        timeEstimate: parsed.timeEstimate
+                    ))
                 }
-                persistTasks()
-                if let first = parsed.first { showDetailOverlay(tasks[tasks.count - parsed.count]) }
+                if !parsedTasks.isEmpty {
+                    showDetailOverlay(tasks[startIndex])
+                }
                 isProcessing = false
             }
         } catch {
@@ -194,53 +160,69 @@ struct AxisTasksView: View {
 
     private func parseTasks() {
         guard !taskInput.isEmpty else { return }
-        let parts = taskInput.components(separatedBy: CharacterSet(charactersIn: ",\n")).map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
-        for p in parts { tasks.append(AxisTask(title: p, priority: .medium, isCompleted: false)) }
-        persistTasks()
-        taskInput = ""
-    }
-
-    private func toggleTask(_ t: AxisTask) {
-        if let i = tasks.firstIndex(where: { $0.id == t.id }) { tasks[i].isCompleted.toggle() }
-        persistTasks()
-    }
-
-    private func deleteTask(_ t: AxisTask) { tasks.removeAll { $0.id == t.id }; persistTasks() }
-
-    private func updateTaskDetails(_ updatedTask: AxisTask) {
-        if let i = tasks.firstIndex(where: { $0.id == updatedTask.id }) {
-            tasks[i] = updatedTask
-            persistTasks()
+        isProcessing = true
+        let parts = taskInput.components(separatedBy: CharacterSet(charactersIn: ",\n"))
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty }
+        for (index, part) in parts.enumerated() {
+            tasks.append(AxisTask(
+                title: part,
+                priority: index == 0 ? .high : .medium,
+                isCompleted: false
+            ))
         }
+        taskInput = ""
+        isProcessing = false
+    }
+
+    private func toggleTask(_ task: AxisTask) {
+        if let index = tasks.firstIndex(where: { $0.id == task.id }) {
+            tasks[index].isCompleted.toggle()
+        }
+    }
+
+    private func deleteTask(_ task: AxisTask) {
+        tasks.removeAll { $0.id == task.id }
     }
 
     @ViewBuilder
     private func detailPromptOverlay(for task: AxisTask) -> some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 12) {
             Text("'\(task.title)'?")
                 .font(.system(size: 11))
                 .foregroundColor(.white)
-            Button("Details") { expandedTaskId = task.id; detailOverlayVisible = false }
-                .buttonStyle(.plain).foregroundColor(.blue).font(.system(size: 11))
-            Button("Skip") { detailOverlayVisible = false; pendingDetailTask = nil }
-                .buttonStyle(.plain).foregroundColor(.gray).font(.system(size: 11))
+            Button("Yes") {
+                expandedTaskId = task.id
+                detailOverlayVisible = false
+            }
+            .buttonStyle(.plain)
+            .foregroundColor(.green)
+            .font(.system(size: 11))
+            Button("No") {
+                detailOverlayVisible = false
+                pendingDetailTask = nil
+            }
+            .buttonStyle(.plain)
+            .foregroundColor(.gray)
+            .font(.system(size: 11))
         }
-        .padding(10).background(Color.black.opacity(0.9)).cornerRadius(8)
+        .padding(10)
+        .background(Color.black.opacity(0.85))
+        .cornerRadius(8)
     }
 }
 
-// MARK: - Model
+// MARK: - Task Model
 
-struct AxisTask: Identifiable, Codable {
+struct AxisTask: Identifiable {
     public let id = UUID()
     var title: String
     var priority: TaskPriority = .medium
     var isCompleted: Bool = false
     var timeEstimate: Int?
-    var deadline: Date?
 }
 
-enum TaskPriority: String, Codable {
+enum TaskPriority: String {
     case high, medium, low
     var color: Color {
         switch self {
@@ -251,445 +233,184 @@ enum TaskPriority: String, Codable {
     }
 }
 
-// MARK: - Task Card (110pt)
+// MARK: - Compact Pomodoro Card (120pt, for Tasks tab)
 
-struct AxisTaskCard: View {
-    let task: AxisTask
-    let isExpanded: Bool
-    let onTap: () -> Void
-    let onToggle: () -> Void
-    let onDelete: () -> Void
-    let onExpandDetails: () -> Void
-    let onSaveDetails: (AxisTask) -> Void
-
-    @State private var editingPriority: TaskPriority
-    @State private var editingTimeEstimate: Int
-    @State private var editingDeadline: Date
-    @State private var showDatePicker: Bool = false
-
-    init(task: AxisTask, isExpanded: Bool, onTap: @escaping () -> Void, onToggle: @escaping () -> Void, onDelete: @escaping () -> Void, onExpandDetails: @escaping () -> Void, onSaveDetails: @escaping (AxisTask) -> Void) {
-        self.task = task
-        self.isExpanded = isExpanded
-        self.onTap = onTap
-        self.onToggle = onToggle
-        self.onDelete = onDelete
-        self.onExpandDetails = onExpandDetails
-        self.onSaveDetails = onSaveDetails
-        _editingPriority = State(initialValue: task.priority)
-        _editingTimeEstimate = State(initialValue: task.timeEstimate ?? 30)
-        _editingDeadline = State(initialValue: task.deadline ?? Date())
-    }
+struct CompactPomodoroCard: View {
+    @ObservedObject private var pomodoro = PomodoroManager.shared
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 4) {
-                Circle().fill(task.priority.color).frame(width: 5, height: 5)
-                Text(task.title).font(.system(size: 11, weight: .medium)).foregroundColor(task.isCompleted ? .gray : .white).lineLimit(isExpanded ? 6 : 2)
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Image(systemName: "timer")
+                    .foregroundColor(.red)
+                    .font(.system(size: 10))
+                Text("Pomodoro")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundColor(.gray)
                 Spacer()
-                Button(action: onDelete) { Image(systemName: "xmark").font(.system(size: 8)).foregroundColor(.gray.opacity(0.6)) }.buttonStyle(.plain)
+                Circle()
+                    .fill(pomodoro.isRunning ? Color.red : Color.clear)
+                    .frame(width: 6, height: 6)
             }
 
             Spacer()
 
-            HStack {
-                if let e = task.timeEstimate { Text("\(e)m").font(.system(size: 8)).foregroundColor(.gray) }
-                if let d = task.deadline { Text(formatDate(d)).font(.system(size: 8)).foregroundColor(.blue) }
-                Spacer()
-                Button(action: onToggle) {
-                    Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle").font(.system(size: 11)).foregroundColor(task.isCompleted ? .green : .gray)
-                }.buttonStyle(.plain)
-            }
+            Text(formatTime(pomodoro.secondsRemaining))
+                .font(.system(size: 18, weight: .medium, design: .monospaced))
+                .foregroundColor(.white)
 
-            if isExpanded {
-                Divider().background(Color.gray.opacity(0.2))
+            HStack(spacing: 8) {
+                Button(action: pomodoro.toggle) {
+                    Image(systemName: pomodoro.isRunning ? "pause.fill" : "play.fill")
+                        .font(.system(size: 10))
+                        .foregroundColor(.white)
+                        .frame(width: 24, height: 24)
+                        .background(Color.white.opacity(0.2))
+                        .cornerRadius(6)
+                }
+                .buttonStyle(.plain)
 
-                // Priority selector
-                HStack(spacing: 4) {
-                    Text("Priority:").font(.system(size: 8)).foregroundColor(.gray)
-                    ForEach([TaskPriority.high, .medium, .low], id: \.self) { p in
-                        Button(action: {
-                            editingPriority = p
-                            saveDetails()
-                        }) {
-                            Circle()
-                                .fill(p.color)
-                                .frame(width: 8, height: 8)
-                                .overlay(Circle().stroke(editingPriority == p ? Color.white : Color.clear, lineWidth: 1))
-                        }
-                        .buttonStyle(.plain)
+                Button(action: pomodoro.reset) {
+                    Image(systemName: "arrow.counterclockwise")
+                        .font(.system(size: 9))
+                        .foregroundColor(.gray)
+                        .frame(width: 20, height: 20)
+                        .background(Color.white.opacity(0.1))
+                        .cornerRadius(4)
+                }
+                .buttonStyle(.plain)
+
+                // Session dots
+                HStack(spacing: 3) {
+                    ForEach(0..<4, id: \.self) { i in
+                        Circle()
+                            .fill(i < pomodoro.sessionsCompleted % 4 ? Color.red : Color.white.opacity(0.3))
+                            .frame(width: 5, height: 5)
                     }
                 }
-
-                // Time estimate slider
-                HStack(spacing: 4) {
-                    Text("Time:").font(.system(size: 8)).foregroundColor(.gray)
-                    Slider(value: Binding(
-                        get: { Double(editingTimeEstimate) },
-                        set: {
-                            editingTimeEstimate = Int($0)
-                            saveDetails()
-                        }
-                    ), in: 5...120, step: 5)
-                    .frame(width: 60)
-                    Text("\(editingTimeEstimate)m").font(.system(size: 8)).foregroundColor(.white)
-                }
-
-                // Deadline picker
-                HStack(spacing: 4) {
-                    Text("Due:").font(.system(size: 8)).foregroundColor(.gray)
-                    DatePicker("", selection: $editingDeadline, displayedComponents: .date)
-                        .labelsHidden()
-                        .scaleEffect(0.5)
-                        .onChange(of: editingDeadline) { _, _ in
-                            saveDetails()
-                        }
-                }
             }
         }
-        .padding(8)
-        .frame(width: 130, height: isExpanded ? 160 : 110)
-        .background(.ultraThinMaterial)
-        .cornerRadius(12)
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.white.opacity(0.15), lineWidth: 0.5)
-        )
-        .contentShape(Rectangle())
-        .onTapGesture(perform: onTap)
+        .padding(10)
+        .frame(width: 140, height: 100)
+        .background(Color.white.opacity(0.08))
+        .cornerRadius(10)
     }
 
-    private func saveDetails() {
-        var updatedTask = task
-        updatedTask.priority = editingPriority
-        updatedTask.timeEstimate = editingTimeEstimate
-        updatedTask.deadline = editingDeadline
-        onSaveDetails(updatedTask)
+    private var progress: Double {
+        Double(pomodoro.secondsRemaining) / Double(pomodoro.sessionDuration)
     }
 
-    private func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d"
-        return formatter.string(from: date)
+    private func formatTime(_ seconds: Int) -> String {
+        let m = seconds / 60
+        let s = seconds % 60
+        return String(format: "%d:%02d", m, s)
     }
 }
 
-// MARK: - Pomodoro Tool Card (110pt)
+// MARK: - Compact Stopwatch Card (100pt)
 
-struct PomodoroToolCard: View {
-    @ObservedObject private var p = PomodoroManager.shared
-    @ObservedObject private var historyManager = PomodoroHistoryManager.shared
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 3) {
-                Image(systemName: "timer").font(.system(size: 9)).foregroundColor(.red)
-                Text("Pomodoro").font(.system(size: 9, weight: .semibold)).foregroundColor(.gray)
-                Spacer()
-                Circle().fill(p.isRunning ? Color.red : Color.clear).frame(width: 5, height: 5)
-            }
-
-            Spacer()
-
-            Text(formatTime(p.secondsRemaining)).font(.system(size: 16, weight: .medium, design: .monospaced)).foregroundColor(.white)
-
-            HStack(spacing: 4) {
-                Button(action: p.toggle) {
-                    Image(systemName: p.isRunning ? "pause.fill" : "play.fill").font(.system(size: 9)).foregroundColor(.white).frame(width: 22, height: 22).background(Color.white.opacity(0.15)).cornerRadius(5)
-                }.buttonStyle(.plain)
-                Button(action: p.reset) {
-                    Image(systemName: "arrow.counterclockwise").font(.system(size: 8)).foregroundColor(.gray).frame(width: 18, height: 18).background(Color.white.opacity(0.08)).cornerRadius(4)
-                }.buttonStyle(.plain)
-                HStack(spacing: 2) {
-                    ForEach(0..<4, id: \.self) { i in Circle().fill(i < p.sessionsCompleted % 4 ? Color.red : Color.gray.opacity(0.3)).frame(width: 4, height: 4) }
-                }
-            }
-
-            Text("\(historyManager.todaySessions)/\(historyManager.weeklyGoal)")
-                .font(.system(size: 8))
-                .foregroundColor(.secondary)
-        }
-        .padding(8)
-        .frame(width: 130, height: 110)
-        .background(.ultraThinMaterial)
-        .cornerRadius(12)
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.white.opacity(0.15), lineWidth: 0.5)
-        )
-    }
-
-    private func formatTime(_ s: Int) -> String {
-        String(format: "%d:%02d", s / 60, s % 60)
-    }
-}
-
-// MARK: - Stopwatch Tool Card (110pt)
-
-struct StopwatchToolCard: View {
-    @State private var s: Int = 0
+struct CompactStopwatchCard: View {
+    @State private var seconds: Int = 0
     @State private var running: Bool = false
-    @State private var task: Task<Void, Never>?
+    @State private var timerTask: Task<Void, Never>?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 3) {
-                Image(systemName: "stopwatch").font(.system(size: 9)).foregroundColor(.orange)
-                Text("Stopwatch").font(.system(size: 9, weight: .semibold)).foregroundColor(.gray)
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Image(systemName: "stopwatch")
+                    .foregroundColor(.orange)
+                    .font(.system(size: 10))
+                Text("Stopwatch")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundColor(.gray)
             }
 
             Spacer()
 
-            Text(formatTime(s)).font(.system(size: 16, weight: .medium, design: .monospaced)).foregroundColor(.white)
+            Text(formatTime(seconds))
+                .font(.system(size: 18, weight: .medium, design: .monospaced))
+                .foregroundColor(.white)
 
             Button(action: running ? stop : start) {
-                Image(systemName: running ? "pause.fill" : "play.fill").font(.system(size: 9)).foregroundColor(.white).frame(width: 22, height: 22).background(Color.white.opacity(0.15)).cornerRadius(5)
-            }.buttonStyle(.plain)
+                Image(systemName: running ? "pause.fill" : "play.fill")
+                    .font(.system(size: 10))
+                    .foregroundColor(.white)
+                    .frame(width: 24, height: 24)
+                    .background(Color.white.opacity(0.2))
+                    .cornerRadius(6)
+            }
+            .buttonStyle(.plain)
         }
-        .padding(8)
-        .frame(width: 110, height: 110)
-        .background(.ultraThinMaterial)
-        .cornerRadius(12)
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.white.opacity(0.15), lineWidth: 0.5)
-        )
+        .padding(10)
+        .frame(width: 120, height: 100)
+        .background(Color.white.opacity(0.08))
+        .cornerRadius(10)
     }
 
     private func start() {
         running = true
-        task = Task {
+        timerTask = Task {
             while !Task.isCancelled && running {
                 try? await Task.sleep(for: .seconds(1))
-                if !Task.isCancelled { s += 1 }
+                if !Task.isCancelled {
+                    seconds += 1
+                }
             }
         }
     }
 
     private func stop() {
-        running = false; task?.cancel(); task = nil
+        running = false
+        timerTask?.cancel()
+        timerTask = nil
     }
 
-    private func formatTime(_ sec: Int) -> String {
-        String(format: "%02d:%02d", sec / 60, sec % 60)
+    private func formatTime(_ s: Int) -> String {
+        String(format: "%02d:%02d", s / 60, s % 60)
     }
 }
 
-// MARK: - Note Tool Card (110pt)
+// MARK: - Compact Note Card (120pt, collapsed by default)
 
-struct NoteToolCard: View {
-    @State private var notes: [QuickNote] = []
-    @State private var expandedNoteId: UUID? = nil
-    @State private var showEditor: Bool = false
+struct CompactNoteCard: View {
+    @State private var text: String = ""
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 3) {
-                Image(systemName: "note.text").font(.system(size: 9)).foregroundColor(.yellow)
-                Text("Notes").font(.system(size: 9, weight: .semibold)).foregroundColor(.gray)
-                Spacer()
-                Button(action: { showEditor = true }) {
-                    Image(systemName: "plus").font(.system(size: 8)).foregroundColor(.gray)
-                }
-                .buttonStyle(.plain)
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Image(systemName: "note.text")
+                    .foregroundColor(.yellow)
+                    .font(.system(size: 10))
+                Text("Note")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundColor(.gray)
             }
 
             Spacer()
 
-            if notes.isEmpty {
-                Text("Tap + to add note")
-                    .font(.system(size: 9))
-                    .foregroundColor(.gray)
-            } else {
-                ForEach(notes.prefix(2)) { note in
-                    HStack(spacing: 4) {
-                        if note.isPinned {
-                            Image(systemName: "pin.fill")
-                                .font(.system(size: 6))
-                                .foregroundColor(.orange)
-                        }
-                        Text(note.title)
-                            .font(.system(size: 9))
-                            .foregroundColor(.white)
-                            .lineLimit(1)
-                    }
-                }
-            }
+            Text(text.isEmpty ? "Tap to note..." : text)
+                .font(.system(size: 11))
+                .foregroundColor(text.isEmpty ? .gray : .white)
+                .lineLimit(3)
         }
-        .padding(8)
-        .frame(width: 110, height: 110)
-        .background(.ultraThinMaterial)
-        .cornerRadius(12)
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.white.opacity(0.15), lineWidth: 0.5)
-        )
-        .onTapGesture { showEditor = true }
-        .popover(isPresented: $showEditor, arrowEdge: .bottom) {
-            NoteEditorPopover(notes: $notes)
+        .padding(10)
+        .frame(width: 120, height: 100)
+        .background(Color.white.opacity(0.08))
+        .cornerRadius(10)
+        .onTapGesture {
+            // Could expand to full note editor
         }
-        .onAppear { loadNotes() }
-    }
-
-    private func loadNotes() {
-        if let data = UserDefaults.standard.data(forKey: "quickNotes"),
-           let saved = try? JSONDecoder().decode([QuickNote].self, from: data) {
-            notes = saved.sorted { $0.isPinned && !$1.isPinned }
+        .onChange(of: text) { _, newValue in
+            UserDefaults.standard.set(newValue, forKey: "quickNote")
         }
-    }
-}
-
-// MARK: - Quick Note Model
-
-struct QuickNote: Identifiable, Codable {
-    public let id = UUID()
-    var title: String
-    var body: String
-    var timestamp: Date
-    var isPinned: Bool
-}
-
-// MARK: - Note Editor Popover
-
-struct NoteEditorPopover: View {
-    @Binding var notes: [QuickNote]
-    @Environment(\.dismiss) private var dismiss
-    @State private var newTitle: String = ""
-    @State private var newBody: String = ""
-    @State private var editingNoteId: UUID? = nil
-
-    var body: some View {
-        VStack(spacing: 12) {
-            HStack {
-                Text("Quick Notes")
-                    .font(.system(size: 12, weight: .semibold))
-                Spacer()
-                Button("Done") { dismiss() }
-                    .buttonStyle(.bordered)
-            }
-
-            // Note list
-            ScrollView {
-                VStack(spacing: 8) {
-                    ForEach(notes) { note in
-                        NoteRow(note: note, onEdit: {
-                            editingNoteId = note.id
-                            newTitle = note.title
-                            newBody = note.body
-                        }, onDelete: {
-                            notes.removeAll { $0.id == note.id }
-                            saveNotes()
-                        }, onTogglePin: {
-                            if let i = notes.firstIndex(where: { $0.id == note.id }) {
-                                notes[i].isPinned.toggle()
-                                notes.sort { $0.isPinned && !$1.isPinned }
-                                saveNotes()
-                            }
-                        })
-                    }
-                }
-            }
-            .frame(height: 150)
-
-            Divider()
-
-            // Add/Edit note
-            VStack(spacing: 6) {
-                TextField("Title", text: $newTitle)
-                    .textFieldStyle(.roundedBorder)
-                    .font(.system(size: 11))
-
-                TextEditor(text: $newBody)
-                    .font(.system(size: 11))
-                    .frame(height: 60)
-                    .cornerRadius(4)
-                    .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color.gray.opacity(0.3), lineWidth: 1))
-
-                Button(action: saveNote) {
-                    Text(editingNoteId == nil ? "Add Note" : "Update Note")
-                        .font(.system(size: 11))
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(newTitle.isEmpty && newBody.isEmpty)
-            }
+        .onAppear {
+            text = UserDefaults.standard.string(forKey: "quickNote") ?? ""
         }
-        .padding(12)
-        .frame(width: 280)
-    }
-
-    private func saveNote() {
-        if let editId = editingNoteId {
-            if let i = notes.firstIndex(where: { $0.id == editId }) {
-                notes[i].title = newTitle
-                notes[i].body = newBody
-            }
-        } else {
-            let note = QuickNote(title: newTitle, body: newBody, timestamp: Date(), isPinned: false)
-            notes.insert(note, at: 0)
-        }
-        saveNotes()
-        newTitle = ""
-        newBody = ""
-        editingNoteId = nil
-    }
-
-    private func saveNotes() {
-        if let data = try? JSONEncoder().encode(notes) {
-            UserDefaults.standard.set(data, forKey: "quickNotes")
-        }
-    }
-}
-
-struct NoteRow: View {
-    let note: QuickNote
-    let onEdit: () -> Void
-    let onDelete: () -> Void
-    let onTogglePin: () -> Void
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            HStack {
-                if note.isPinned {
-                    Image(systemName: "pin.fill")
-                        .font(.system(size: 6))
-                        .foregroundColor(.orange)
-                }
-                Text(note.title)
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundColor(.primary)
-                    .lineLimit(1)
-                Spacer()
-                Text(formatDate(note.timestamp))
-                    .font(.system(size: 7))
-                    .foregroundColor(.secondary)
-            }
-            if !note.body.isEmpty {
-                Text(note.body)
-                    .font(.system(size: 9))
-                    .foregroundColor(.secondary)
-                    .lineLimit(2)
-            }
-        }
-        .padding(6)
-        .background(Color.gray.opacity(0.1))
-        .cornerRadius(6)
-        .contextMenu {
-            Button(action: onEdit) { Label("Edit", systemImage: "pencil") }
-            Button(action: onTogglePin) { Label(note.isPinned ? "Unpin" : "Pin", systemImage: note.isPinned ? "pin.slash" : "pin") }
-            Divider()
-            Button(role: .destructive, action: onDelete) { Label("Delete", systemImage: "trash") }
-        }
-    }
-
-    private func formatDate(_ date: Date) -> String {
-        let formatter = RelativeDateTimeFormatter()
-        formatter.unitsStyle = .abbreviated
-        return formatter.localizedString(for: date, relativeTo: Date())
     }
 }
 
 #Preview {
     AxisTasksView()
-        .frame(width: 400, height: 180)
+        .frame(width: 400, height: 200)
         .background(Color.black)
 }
